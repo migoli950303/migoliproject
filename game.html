@@ -1,0 +1,1986 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>銀河入侵者</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #080018;
+        color: #fff;
+        font-family: "Courier New", monospace;
+    }
+
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background:
+            radial-gradient(circle at 50% 20%, rgba(255, 0, 200, 0.15), transparent 35%),
+            linear-gradient(#09001c, #16002f 55%, #05000d);
+    }
+
+    /* 背景星星 */
+    body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0.45;
+        background-image:
+            radial-gradient(circle, #fff 1px, transparent 1px),
+            radial-gradient(circle, #ff4de1 1px, transparent 1px),
+            radial-gradient(circle, #00ffff 1px, transparent 1px);
+        background-size: 73px 73px, 121px 121px, 181px 181px;
+        background-position: 10px 20px, 40px 80px, 90px 30px;
+        animation: starMove 20s linear infinite;
+    }
+
+    @keyframes starMove {
+        from {
+            transform: translateY(0);
+        }
+
+        to {
+            transform: translateY(100px);
+        }
+    }
+
+    /* 主遊戲區 */
+    #gameWrapper {
+        width: min(96vw, 1000px);
+        height: min(94vh, 850px);
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* 回首頁 */
+    #homeLink {
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 20;
+
+        color: #00ffff;
+        text-decoration: none;
+        font-size: 16px;
+        font-weight: bold;
+
+        text-shadow:
+            0 0 5px #00ffff,
+            0 0 12px #00ffff;
+
+        padding: 8px 12px;
+        border: 2px solid #00ffff;
+        background: rgba(0, 0, 30, 0.75);
+
+        transition: 0.2s;
+    }
+
+    #homeLink:hover {
+        color: #ff3cf7;
+        border-color: #ff3cf7;
+        text-shadow:
+            0 0 5px #ff3cf7,
+            0 0 12px #ff3cf7;
+
+        transform: translateY(-2px);
+    }
+
+    /* 標題 */
+    #title {
+        margin-top: 38px;
+        margin-bottom: 8px;
+
+        font-size: clamp(24px, 5vw, 48px);
+        letter-spacing: 5px;
+        color: #ff44e8;
+
+        text-align: center;
+
+        text-shadow:
+            3px 3px 0 #490078,
+            0 0 8px #ff00d9,
+            0 0 18px #ff00d9,
+            0 0 35px #ff00d9;
+
+        animation: neonPulse 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes neonPulse {
+        from {
+            filter: brightness(0.9);
+        }
+
+        to {
+            filter: brightness(1.3);
+        }
+    }
+
+    #subtitle {
+        color: #00ffff;
+        font-size: 12px;
+        letter-spacing: 3px;
+        margin-bottom: 8px;
+
+        text-shadow:
+            0 0 6px #00ffff,
+            0 0 12px #00ffff;
+    }
+
+    /* HUD */
+    #hud {
+        width: min(92vw, 850px);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        padding: 7px 15px;
+        margin-bottom: 7px;
+
+        border: 2px solid #ff38dc;
+        background: rgba(20, 0, 40, 0.8);
+
+        box-shadow:
+            0 0 8px #ff00d4,
+            inset 0 0 10px rgba(255, 0, 212, 0.2);
+
+        font-size: clamp(12px, 2vw, 17px);
+    }
+
+    .hudItem {
+        color: #fff;
+        text-shadow: 0 0 6px #fff;
+    }
+
+    .hudValue {
+        color: #00ffff;
+        font-weight: bold;
+        text-shadow:
+            0 0 5px #00ffff,
+            0 0 12px #00ffff;
+    }
+
+    #livesValue {
+        color: #ff4fda;
+        text-shadow:
+            0 0 5px #ff4fda,
+            0 0 12px #ff4fda;
+    }
+
+    /* Canvas 外框 */
+    #canvasContainer {
+        position: relative;
+        width: min(92vw, 850px);
+        aspect-ratio: 4 / 3;
+
+        border: 4px solid #00ffff;
+        background: #020008;
+
+        box-shadow:
+            0 0 8px #00ffff,
+            0 0 25px rgba(0, 255, 255, 0.7),
+            inset 0 0 30px rgba(0, 255, 255, 0.08);
+
+        overflow: hidden;
+    }
+
+    canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+
+        background:
+            linear-gradient(
+                rgba(0, 255, 255, 0.025) 50%,
+                rgba(255, 0, 255, 0.025) 50%
+            );
+        background-size: 100% 4px;
+    }
+
+    /* 掃描線 */
+    #canvasContainer::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+
+        background: repeating-linear-gradient(
+            to bottom,
+            transparent 0,
+            transparent 3px,
+            rgba(0, 255, 255, 0.035) 4px
+        );
+    }
+
+    /* 開始 / 結束畫面 */
+    .overlay {
+        position: absolute;
+        inset: 0;
+        z-index: 10;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+
+        background:
+            radial-gradient(
+                circle,
+                rgba(30, 0, 60, 0.7),
+                rgba(0, 0, 10, 0.94)
+            );
+
+        text-align: center;
+    }
+
+    .overlay.hidden {
+        display: none;
+    }
+
+    .overlayTitle {
+        font-size: clamp(26px, 6vw, 55px);
+        color: #ff42e6;
+
+        text-shadow:
+            3px 3px 0 #480066,
+            0 0 8px #ff00e6,
+            0 0 25px #ff00e6;
+
+        margin-bottom: 15px;
+    }
+
+    .overlayText {
+        color: #00ffff;
+        font-size: clamp(13px, 2.5vw, 18px);
+        line-height: 1.8;
+
+        text-shadow: 0 0 8px #00ffff;
+
+        margin-bottom: 25px;
+    }
+
+    .pixelButton {
+        border: 3px solid #00ffff;
+        background: #10002d;
+        color: #00ffff;
+
+        font-family: "Courier New", monospace;
+        font-weight: bold;
+        font-size: 18px;
+
+        padding: 12px 28px;
+
+        cursor: pointer;
+
+        box-shadow:
+            5px 5px 0 #ff00c8,
+            0 0 12px #00ffff;
+
+        text-shadow: 0 0 6px #00ffff;
+
+        transition: 0.15s;
+    }
+
+    .pixelButton:hover {
+        background: #260052;
+        color: #fff;
+
+        transform: translate(2px, 2px);
+
+        box-shadow:
+            3px 3px 0 #ff00c8,
+            0 0 20px #00ffff;
+    }
+
+    .pixelButton:active {
+        transform: translate(5px, 5px);
+        box-shadow:
+            0 0 10px #00ffff;
+    }
+
+    /* 手機控制器 */
+    #mobileControls {
+        display: none;
+
+        width: min(92vw, 850px);
+
+        margin-top: 10px;
+
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 10px;
+    }
+
+    .controlButton {
+        height: 58px;
+
+        border: 3px solid #00ffff;
+        background: rgba(10, 0, 35, 0.9);
+
+        color: #00ffff;
+
+        font-family: "Courier New", monospace;
+        font-size: 25px;
+        font-weight: bold;
+
+        box-shadow:
+            0 0 8px #00ffff,
+            inset 0 0 10px rgba(0, 255, 255, 0.1);
+
+        user-select: none;
+        touch-action: none;
+    }
+
+    .controlButton.shoot {
+        color: #ff45dc;
+        border-color: #ff45dc;
+
+        box-shadow:
+            0 0 8px #ff45dc,
+            inset 0 0 10px rgba(255, 0, 200, 0.1);
+    }
+
+    .controlButton:active {
+        background: rgba(0, 255, 255, 0.2);
+        transform: scale(0.95);
+    }
+
+    #hint {
+        margin-top: 7px;
+
+        color: #bca7d8;
+        font-size: 11px;
+
+        text-align: center;
+    }
+
+    /* 手機 */
+    @media (max-width: 700px) {
+        #gameWrapper {
+            width: 100vw;
+            height: 100vh;
+            padding-top: 3px;
+        }
+
+        #homeLink {
+            left: 8px;
+            top: 5px;
+            font-size: 12px;
+            padding: 6px 8px;
+        }
+
+        #title {
+            margin-top: 38px;
+            margin-bottom: 3px;
+            font-size: 25px;
+            letter-spacing: 2px;
+        }
+
+        #subtitle {
+            font-size: 9px;
+            margin-bottom: 5px;
+        }
+
+        #hud {
+            width: 94vw;
+            margin-bottom: 5px;
+            padding: 5px 8px;
+            font-size: 11px;
+        }
+
+        #canvasContainer {
+            width: 94vw;
+            aspect-ratio: 3 / 4;
+            max-height: 65vh;
+        }
+
+        #mobileControls {
+            display: grid;
+        }
+
+        #hint {
+            display: none;
+        }
+    }
+
+    /* 非常小的手機 */
+    @media (max-height: 650px) {
+        #title {
+            font-size: 21px;
+            margin-top: 35px;
+        }
+
+        #subtitle {
+            display: none;
+        }
+
+        #canvasContainer {
+            max-height: 57vh;
+        }
+
+        .controlButton {
+            height: 48px;
+        }
+    }
+
+    @media (pointer: coarse) {
+        #mobileControls {
+            display: grid;
+        }
+
+        #hint {
+            display: none;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div id="gameWrapper">
+
+    <a id="homeLink" href="index.html">← 回首頁</a>
+
+    <div id="title">銀河入侵者</div>
+
+    <div id="subtitle">SPACE INVADERS // SYNTHWAVE EDITION</div>
+
+    <div id="hud">
+        <div class="hudItem">
+            分數：
+            <span id="scoreValue" class="hudValue">0</span>
+        </div>
+
+        <div class="hudItem">
+            波次：
+            <span id="waveValue" class="hudValue">1</span>
+        </div>
+
+        <div class="hudItem">
+            最高分：
+            <span id="highScoreValue" class="hudValue">0</span>
+        </div>
+
+        <div class="hudItem">
+            生命：
+            <span id="livesValue">♥ ♥ ♥</span>
+        </div>
+    </div>
+
+    <div id="canvasContainer">
+
+        <canvas id="gameCanvas"></canvas>
+
+        <!-- 開始畫面 -->
+        <div id="startOverlay" class="overlay">
+
+            <div class="overlayTitle">
+                銀河入侵者
+            </div>
+
+            <div class="overlayText">
+                外星艦隊正在入侵！<br>
+                消滅所有敵人，守護銀河。
+            </div>
+
+            <button id="startButton" class="pixelButton">
+                開始遊戲
+            </button>
+
+        </div>
+
+        <!-- 遊戲結束 -->
+        <div id="gameOverOverlay" class="overlay hidden">
+
+            <div class="overlayTitle">
+                遊戲結束
+            </div>
+
+            <div class="overlayText">
+                最終分數：
+                <span id="finalScore">0</span>
+                <br>
+                最高分：
+                <span id="finalHighScore">0</span>
+            </div>
+
+            <button id="restartButton" class="pixelButton">
+                重新開始
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- 手機控制 -->
+    <div id="mobileControls">
+
+        <button
+            id="leftButton"
+            class="controlButton"
+            aria-label="向左">
+            ◀
+        </button>
+
+        <button
+            id="shootButton"
+            class="controlButton shoot"
+            aria-label="射擊">
+            ●
+        </button>
+
+        <button
+            id="rightButton"
+            class="controlButton"
+            aria-label="向右">
+            ▶
+        </button>
+
+    </div>
+
+    <div id="hint">
+        電腦：← → 移動　｜　空白鍵射擊
+    </div>
+
+</div>
+
+
+<script>
+/* =========================================================
+   銀河入侵者
+   所有程式都放在這個 HTML 中
+========================================================= */
+
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+
+/* ---------------------------------------------------------
+   UI
+--------------------------------------------------------- */
+
+const scoreValue = document.getElementById("scoreValue");
+const highScoreValue = document.getElementById("highScoreValue");
+const livesValue = document.getElementById("livesValue");
+const waveValue = document.getElementById("waveValue");
+
+const startOverlay = document.getElementById("startOverlay");
+const gameOverOverlay = document.getElementById("gameOverOverlay");
+
+const startButton = document.getElementById("startButton");
+const restartButton = document.getElementById("restartButton");
+
+const finalScore = document.getElementById("finalScore");
+const finalHighScore = document.getElementById("finalHighScore");
+
+/* ---------------------------------------------------------
+   Canvas 尺寸
+--------------------------------------------------------- */
+
+let WIDTH = 800;
+let HEIGHT = 600;
+
+function resizeCanvas() {
+
+    const rect = canvas.getBoundingClientRect();
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    canvas.width = Math.floor(rect.width * dpr);
+    canvas.height = Math.floor(rect.height * dpr);
+
+    ctx.setTransform(
+        canvas.width / WIDTH,
+        0,
+        0,
+        canvas.height / HEIGHT,
+        0,
+        0
+    );
+}
+
+window.addEventListener("resize", resizeCanvas);
+
+
+/* ---------------------------------------------------------
+   遊戲狀態
+--------------------------------------------------------- */
+
+let gameRunning = false;
+
+let score = 0;
+
+let highScore =
+    Number(localStorage.getItem("spaceInvadersHighScore")) || 0;
+
+let lives = 3;
+
+let wave = 1;
+
+let lastTime = 0;
+
+let animationId = null;
+
+
+/* ---------------------------------------------------------
+   玩家
+--------------------------------------------------------- */
+
+const player = {
+
+    x: WIDTH / 2,
+
+    y: HEIGHT - 60,
+
+    width: 46,
+
+    height: 26,
+
+    speed: 430,
+
+    cooldown: 0,
+
+    shootDelay: 0.25,
+
+    invincible: 0
+
+};
+
+
+/* ---------------------------------------------------------
+   子彈
+--------------------------------------------------------- */
+
+let playerBullets = [];
+
+let enemyBullets = [];
+
+
+/* ---------------------------------------------------------
+   敵人
+--------------------------------------------------------- */
+
+let enemies = [];
+
+let enemyDirection = 1;
+
+let enemyMoveTimer = 0;
+
+let enemyMoveDelay = 0.5;
+
+let enemyDropDistance = 25;
+
+let enemyShootTimer = 0;
+
+
+/* ---------------------------------------------------------
+   鍵盤控制
+--------------------------------------------------------- */
+
+const keys = {
+
+    left: false,
+
+    right: false,
+
+    shoot: false
+
+};
+
+document.addEventListener("keydown", function(event) {
+
+    if (
+        event.code === "ArrowLeft" ||
+        event.code === "ArrowRight" ||
+        event.code === "Space"
+    ) {
+        event.preventDefault();
+    }
+
+    if (event.code === "ArrowLeft") {
+        keys.left = true;
+    }
+
+    if (event.code === "ArrowRight") {
+        keys.right = true;
+    }
+
+    if (event.code === "Space") {
+        keys.shoot = true;
+    }
+
+});
+
+
+document.addEventListener("keyup", function(event) {
+
+    if (event.code === "ArrowLeft") {
+        keys.left = false;
+    }
+
+    if (event.code === "ArrowRight") {
+        keys.right = false;
+    }
+
+    if (event.code === "Space") {
+        keys.shoot = false;
+    }
+
+});
+
+
+/* ---------------------------------------------------------
+   手機觸控
+--------------------------------------------------------- */
+
+function setupTouchButton(element, keyName) {
+
+    element.addEventListener(
+        "pointerdown",
+        function(event) {
+
+            event.preventDefault();
+
+            keys[keyName] = true;
+
+        }
+    );
+
+    element.addEventListener(
+        "pointerup",
+        function(event) {
+
+            event.preventDefault();
+
+            keys[keyName] = false;
+
+        }
+    );
+
+    element.addEventListener(
+        "pointercancel",
+        function() {
+
+            keys[keyName] = false;
+
+        }
+    );
+
+    element.addEventListener(
+        "pointerleave",
+        function() {
+
+            keys[keyName] = false;
+
+        }
+    );
+}
+
+
+setupTouchButton(
+    document.getElementById("leftButton"),
+    "left"
+);
+
+setupTouchButton(
+    document.getElementById("rightButton"),
+    "right"
+);
+
+setupTouchButton(
+    document.getElementById("shootButton"),
+    "shoot"
+);
+
+
+/* ---------------------------------------------------------
+   建立敵人
+--------------------------------------------------------- */
+
+function createEnemies() {
+
+    enemies = [];
+
+    const rows = Math.min(3 + wave, 6);
+
+    const columns = 9;
+
+    const enemyWidth = 38;
+
+    const enemyHeight = 25;
+
+    const gapX = 22;
+
+    const gapY = 24;
+
+    const totalWidth =
+        columns * enemyWidth +
+        (columns - 1) * gapX;
+
+    const startX =
+        (WIDTH - totalWidth) / 2;
+
+    const startY = 70;
+
+    for (let row = 0; row < rows; row++) {
+
+        for (let col = 0; col < columns; col++) {
+
+            let type = row % 3;
+
+            enemies.push({
+
+                x: startX + col * (enemyWidth + gapX),
+
+                y: startY + row * (enemyHeight + gapY),
+
+                width: enemyWidth,
+
+                height: enemyHeight,
+
+                type: type,
+
+                alive: true,
+
+                points:
+                    type === 0 ? 30 :
+                    type === 1 ? 20 :
+                    10
+
+            });
+
+        }
+
+    }
+
+    enemyDirection = 1;
+
+    enemyMoveTimer = 0;
+
+    enemyMoveDelay =
+        Math.max(0.12, 0.5 - wave * 0.025);
+
+}
+
+
+/* ---------------------------------------------------------
+   重設遊戲
+--------------------------------------------------------- */
+
+function resetGame() {
+
+    score = 0;
+
+    lives = 3;
+
+    wave = 1;
+
+    player.x = WIDTH / 2;
+
+    player.y = HEIGHT - 60;
+
+    player.cooldown = 0;
+
+    player.invincible = 0;
+
+    playerBullets = [];
+
+    enemyBullets = [];
+
+    createEnemies();
+
+    updateHUD();
+
+}
+
+
+/* ---------------------------------------------------------
+   開始遊戲
+--------------------------------------------------------- */
+
+function startGame() {
+
+    resetGame();
+
+    gameRunning = true;
+
+    startOverlay.classList.add("hidden");
+
+    gameOverOverlay.classList.add("hidden");
+
+    lastTime = performance.now();
+
+    cancelAnimationFrame(animationId);
+
+    animationId = requestAnimationFrame(gameLoop);
+
+}
+
+
+/* ---------------------------------------------------------
+   遊戲結束
+--------------------------------------------------------- */
+
+function endGame() {
+
+    gameRunning = false;
+
+    if (score > highScore) {
+
+        highScore = score;
+
+        localStorage.setItem(
+            "spaceInvadersHighScore",
+            highScore
+        );
+
+    }
+
+    finalScore.textContent = score;
+
+    finalHighScore.textContent = highScore;
+
+    updateHUD();
+
+    gameOverOverlay.classList.remove("hidden");
+
+}
+
+
+/* ---------------------------------------------------------
+   HUD
+--------------------------------------------------------- */
+
+function updateHUD() {
+
+    scoreValue.textContent = score;
+
+    highScoreValue.textContent = highScore;
+
+    waveValue.textContent = wave;
+
+    livesValue.textContent =
+        "♥ ".repeat(Math.max(0, lives)).trim();
+
+}
+
+
+/* ---------------------------------------------------------
+   玩家射擊
+--------------------------------------------------------- */
+
+function playerShoot() {
+
+    if (player.cooldown > 0) {
+        return;
+    }
+
+    playerBullets.push({
+
+        x: player.x,
+
+        y: player.y - player.height / 2,
+
+        width: 5,
+
+        height: 18,
+
+        speed: 650
+
+    });
+
+    player.cooldown = player.shootDelay;
+
+}
+
+
+/* ---------------------------------------------------------
+   敵人射擊
+--------------------------------------------------------- */
+
+function enemyShoot() {
+
+    const aliveEnemies =
+        enemies.filter(enemy => enemy.alive);
+
+    if (aliveEnemies.length === 0) {
+        return;
+    }
+
+    /* 優先選擇比較下面的敵人 */
+
+    const columns = {};
+
+    aliveEnemies.forEach(enemy => {
+
+        const column =
+            Math.round(enemy.x / 50);
+
+        if (
+            !columns[column] ||
+            enemy.y > columns[column].y
+        ) {
+            columns[column] = enemy;
+        }
+
+    });
+
+    const shooters =
+        Object.values(columns);
+
+    const shooter =
+        shooters[
+            Math.floor(Math.random() * shooters.length)
+        ];
+
+    enemyBullets.push({
+
+        x: shooter.x,
+
+        y: shooter.y + shooter.height / 2,
+
+        width: 5,
+
+        height: 15,
+
+        speed: 230 + wave * 10
+
+    });
+
+}
+
+
+/* ---------------------------------------------------------
+   碰撞
+--------------------------------------------------------- */
+
+function isColliding(a, b) {
+
+    return (
+        a.x - a.width / 2 <
+        b.x + b.width / 2 &&
+
+        a.x + a.width / 2 >
+        b.x - b.width / 2 &&
+
+        a.y - a.height / 2 <
+        b.y + b.height / 2 &&
+
+        a.y + a.height / 2 >
+        b.y - b.height / 2
+    );
+
+}
+
+
+/* ---------------------------------------------------------
+   更新玩家
+--------------------------------------------------------- */
+
+function updatePlayer(delta) {
+
+    if (keys.left) {
+
+        player.x -=
+            player.speed * delta;
+
+    }
+
+    if (keys.right) {
+
+        player.x +=
+            player.speed * delta;
+
+    }
+
+    const halfWidth =
+        player.width / 2;
+
+    player.x =
+        Math.max(
+            halfWidth,
+            Math.min(
+                WIDTH - halfWidth,
+                player.x
+            )
+        );
+
+    if (player.cooldown > 0) {
+
+        player.cooldown -= delta;
+
+    }
+
+    if (player.invincible > 0) {
+
+        player.invincible -= delta;
+
+    }
+
+    if (keys.shoot) {
+
+        playerShoot();
+
+    }
+
+}
+
+
+/* ---------------------------------------------------------
+   更新玩家子彈
+--------------------------------------------------------- */
+
+function updatePlayerBullets(delta) {
+
+    playerBullets.forEach(bullet => {
+
+        bullet.y -=
+            bullet.speed * delta;
+
+    });
+
+    playerBullets =
+        playerBullets.filter(
+            bullet => bullet.y > -30
+        );
+
+}
+
+
+/* ---------------------------------------------------------
+   更新敵人
+--------------------------------------------------------- */
+
+function updateEnemies(delta) {
+
+    enemyMoveTimer += delta;
+
+    if (enemyMoveTimer >= enemyMoveDelay) {
+
+        enemyMoveTimer = 0;
+
+        let hitEdge = false;
+
+        const aliveEnemies =
+            enemies.filter(enemy => enemy.alive);
+
+        aliveEnemies.forEach(enemy => {
+
+            const nextX =
+                enemy.x +
+                enemyDirection * 20;
+
+            if (
+                nextX - enemy.width / 2 < 20 ||
+                nextX + enemy.width / 2 >
+                WIDTH - 20
+            ) {
+
+                hitEdge = true;
+
+            }
+
+        });
+
+        if (hitEdge) {
+
+            enemyDirection *= -1;
+
+            aliveEnemies.forEach(enemy => {
+
+                enemy.y += enemyDropDistance;
+
+            });
+
+        } else {
+
+            aliveEnemies.forEach(enemy => {
+
+                enemy.x +=
+                    enemyDirection * 20;
+
+            });
+
+        }
+
+    }
+
+    /* 敵人射擊 */
+
+    enemyShootTimer += delta;
+
+    const shootInterval =
+        Math.max(
+            0.35,
+            1.4 - wave * 0.08
+        );
+
+    if (enemyShootTimer >= shootInterval) {
+
+        enemyShootTimer = 0;
+
+        enemyShoot();
+
+    }
+
+}
+
+
+/* ---------------------------------------------------------
+   更新敵人子彈
+--------------------------------------------------------- */
+
+function updateEnemyBullets(delta) {
+
+    enemyBullets.forEach(bullet => {
+
+        bullet.y +=
+            bullet.speed * delta;
+
+    });
+
+    enemyBullets =
+        enemyBullets.filter(
+            bullet => bullet.y < HEIGHT + 30
+        );
+
+}
+
+
+/* ---------------------------------------------------------
+   處理碰撞
+--------------------------------------------------------- */
+
+function handleCollisions() {
+
+    /* 玩家子彈 vs 敵人 */
+
+    for (let i = playerBullets.length - 1; i >= 0; i--) {
+
+        const bullet =
+            playerBullets[i];
+
+        let hit = false;
+
+        for (let j = 0; j < enemies.length; j++) {
+
+            const enemy = enemies[j];
+
+            if (!enemy.alive) {
+                continue;
+            }
+
+            if (isColliding(bullet, enemy)) {
+
+                enemy.alive = false;
+
+                score += enemy.points;
+
+                playerBullets.splice(i, 1);
+
+                hit = true;
+
+                updateHUD();
+
+                break;
+
+            }
+
+        }
+
+        if (hit) {
+            continue;
+        }
+
+    }
+
+
+    /* 敵人子彈 vs 玩家 */
+
+    if (player.invincible <= 0) {
+
+        for (
+            let i = enemyBullets.length - 1;
+            i >= 0;
+            i--
+        ) {
+
+            const bullet =
+                enemyBullets[i];
+
+            if (isColliding(bullet, player)) {
+
+                enemyBullets.splice(i, 1);
+
+                lives--;
+
+                player.invincible = 1.2;
+
+                updateHUD();
+
+                if (lives <= 0) {
+
+                    endGame();
+
+                    return;
+
+                }
+
+                break;
+
+            }
+
+        }
+
+    }
+
+
+    /* 敵人碰到玩家 / 防線 */
+
+    const aliveEnemies =
+        enemies.filter(enemy => enemy.alive);
+
+    for (const enemy of aliveEnemies) {
+
+        if (
+            enemy.y +
+            enemy.height / 2 >
+            HEIGHT - 100
+        ) {
+
+            endGame();
+
+            return;
+
+        }
+
+    }
+
+}
+
+
+/* ---------------------------------------------------------
+   下一波
+--------------------------------------------------------- */
+
+function checkWave() {
+
+    const remaining =
+        enemies.some(enemy => enemy.alive);
+
+    if (!remaining) {
+
+        wave++;
+
+        score += 100 * wave;
+
+        playerBullets = [];
+
+        enemyBullets = [];
+
+        createEnemies();
+
+        updateHUD();
+
+    }
+
+}
+
+
+/* =========================================================
+   繪圖
+========================================================= */
+
+/* ---------------------------------------------------------
+   畫背景
+--------------------------------------------------------- */
+
+function drawBackground() {
+
+    ctx.fillStyle = "#020008";
+
+    ctx.fillRect(
+        0,
+        0,
+        WIDTH,
+        HEIGHT
+    );
+
+
+    /* 星星 */
+
+    const starSeed = 100;
+
+    for (let i = 0; i < starSeed; i++) {
+
+        const x =
+            (i * 97) % WIDTH;
+
+        const y =
+            (i * 53 + Math.floor(performance.now() / 80)) %
+            HEIGHT;
+
+        const size =
+            i % 5 === 0 ? 2 : 1;
+
+        ctx.fillStyle =
+            i % 4 === 0
+                ? "#ff44dd"
+                : "#00ffff";
+
+        ctx.globalAlpha =
+            0.3 + (i % 5) * 0.1;
+
+        ctx.fillRect(
+            x,
+            y,
+            size,
+            size
+        );
+
+    }
+
+    ctx.globalAlpha = 1;
+
+
+    /* 地平線 */
+
+    const horizon =
+        HEIGHT - 105;
+
+    ctx.strokeStyle =
+        "rgba(255, 0, 220, 0.35)";
+
+    ctx.lineWidth = 2;
+
+    for (
+        let y = horizon;
+        y < HEIGHT;
+        y += 14
+    ) {
+
+        ctx.beginPath();
+
+        ctx.moveTo(0, y);
+
+        ctx.lineTo(WIDTH, y);
+
+        ctx.stroke();
+
+    }
+
+
+    /* 地面透視線 */
+
+    for (
+        let x = -WIDTH;
+        x < WIDTH * 2;
+        x += 70
+    ) {
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            WIDTH / 2,
+            horizon
+        );
+
+        ctx.lineTo(
+            WIDTH / 2 +
+            (x - WIDTH / 2) * 2,
+            HEIGHT
+        );
+
+        ctx.stroke();
+
+    }
+
+
+    ctx.strokeStyle =
+        "rgba(0, 255, 255, 0.25)";
+
+    ctx.beginPath();
+
+    ctx.moveTo(0, horizon);
+
+    ctx.lineTo(WIDTH, horizon);
+
+    ctx.stroke();
+
+}
+
+
+/* ---------------------------------------------------------
+   畫玩家
+--------------------------------------------------------- */
+
+function drawPlayer() {
+
+    if (
+        player.invincible > 0 &&
+        Math.floor(player.invincible * 12) % 2 === 0
+    ) {
+        return;
+    }
+
+    const x = player.x;
+
+    const y = player.y;
+
+
+    ctx.save();
+
+    ctx.shadowColor = "#00ffff";
+
+    ctx.shadowBlur = 15;
+
+
+    /* 船身 */
+
+    ctx.fillStyle = "#00ffff";
+
+    ctx.fillRect(
+        x - 23,
+        y - 7,
+        46,
+        14
+    );
+
+
+    /* 船頂 */
+
+    ctx.fillStyle = "#ff45dc";
+
+    ctx.fillRect(
+        x - 12,
+        y - 15,
+        24,
+        8
+    );
+
+
+    /* 駕駛艙 */
+
+    ctx.fillStyle = "#ffffff";
+
+    ctx.fillRect(
+        x - 6,
+        y - 12,
+        12,
+        7
+    );
+
+
+    /* 左右炮管 */
+
+    ctx.fillStyle = "#00ffff";
+
+    ctx.fillRect(
+        x - 28,
+        y - 4,
+        7,
+        12
+    );
+
+    ctx.fillRect(
+        x + 21,
+        y - 4,
+        7,
+        12
+    );
+
+
+    /* 引擎 */
+
+    ctx.fillStyle = "#ff00d9";
+
+    ctx.fillRect(
+        x - 15,
+        y + 7,
+        8,
+        8
+    );
+
+    ctx.fillRect(
+        x + 7,
+        y + 7,
+        8,
+        8
+    );
+
+
+    ctx.restore();
+
+}
+
+
+/* ---------------------------------------------------------
+   畫敵人
+--------------------------------------------------------- */
+
+function drawEnemy(enemy) {
+
+    if (!enemy.alive) {
+        return;
+    }
+
+    const x = enemy.x;
+
+    const y = enemy.y;
+
+
+    ctx.save();
+
+
+    let mainColor;
+
+    let glowColor;
+
+    if (enemy.type === 0) {
+
+        mainColor = "#ff39d9";
+
+        glowColor = "#ff00d9";
+
+    } else if (enemy.type === 1) {
+
+        mainColor = "#8c52ff";
+
+        glowColor = "#7b00ff";
+
+    } else {
+
+        mainColor = "#00ffff";
+
+        glowColor = "#00ffff";
+
+    }
+
+
+    ctx.shadowColor = glowColor;
+
+    ctx.shadowBlur = 12;
+
+    ctx.fillStyle = mainColor;
+
+
+    if (enemy.type === 0) {
+
+        /* 螃蟹型 */
+
+        ctx.fillRect(
+            x - 17,
+            y - 9,
+            34,
+            17
+        );
+
+        ctx.fillRect(
+            x - 22,
+            y - 5,
+            5,
+            10
+        );
+
+        ctx.fillRect(
+            x + 17,
+            y - 5,
+            5,
+            10
+        );
+
+        ctx.fillRect(
+            x - 12,
+            y + 8,
+            6,
+            5
+        );
+
+        ctx.fillRect(
+            x + 6,
+            y + 8,
+            6,
+            5
+        );
+
+    } else if (enemy.type === 1) {
+
+        /* UFO 型 */
+
+        ctx.fillRect(
+            x - 19,
+            y - 5,
+            38,
+            11
+        );
+
+        ctx.fillRect(
+            x - 12,
+            y - 10,
+            24,
+            7
+        );
+
+        ctx.fillRect(
+            x - 7,
+            y - 14,
+            14,
+            5
+        );
+
+        ctx.fillRect(
+            x - 22,
+            y + 2,
+            5,
+            5
+        );
+
+        ctx.fillRect(
+            x + 17,
+            y + 2,
+            5,
+            5
+        );
+
+    } else {
+
+        /* 方塊型 */
+
+        ctx.fillRect(
+            x - 16,
+            y - 12,
+            32,
+            23
+        );
+
+        ctx.fillRect(
+            x - 22,
+            y - 6,
+            6,
+            10
+        );
+
+        ctx.fillRect(
+            x + 16,
+            y - 6,
+            6,
+            10
+        );
+
+        ctx.fillRect(
+            x - 10,
+            y + 10,
+            6,
+            6
+        );
+
+        ctx.fillRect(
+            x + 4,
+            y + 10,
+            6,
+            6
+        );
+
+    }
+
+
+    /* 眼睛 */
+
+    ctx.shadowBlur = 0;
+
+    ctx.fillStyle = "#05000b";
+
+    ctx.fillRect(
+        x - 9,
+        y - 3,
+        5,
+        6
+    );
+
+    ctx.fillRect(
+        x + 4,
+        y - 3,
+        5,
+        6
+    );
+
+
+    ctx.restore();
+
+}
+
+
+/* ---------------------------------------------------------
+   畫玩家子彈
+--------------------------------------------------------- */
+
+function drawPlayerBullets() {
+
+    ctx.save();
+
+    ctx.shadowColor = "#00ffff";
+
+    ctx.shadowBlur = 15;
+
+    ctx.fillStyle = "#00ffff";
+
+    playerBullets.forEach(bullet => {
+
+        ctx.fillRect(
+            bullet.x - bullet.width / 2,
+            bullet.y - bullet.height / 2,
+            bullet.width,
+            bullet.height
+        );
+
+    });
+
+    ctx.restore();
+
+}
+
+
+/* ---------------------------------------------------------
+   畫敵人子彈
+--------------------------------------------------------- */
+
+function drawEnemyBullets() {
+
+    ctx.save();
+
+    ctx.shadowColor = "#ff00dd";
+
+    ctx.shadowBlur = 12;
+
+    ctx.fillStyle = "#ff44dd";
+
+    enemyBullets.forEach(bullet => {
+
+        ctx.fillRect(
+            bullet.x - bullet.width / 2,
+            bullet.y - bullet.height / 2,
+            bullet.width,
+            bullet.height
+        );
+
+    });
+
+    ctx.restore();
+
+}
+
+
+/* ---------------------------------------------------------
+   畫遊戲
+--------------------------------------------------------- */
+
+function drawGame() {
+
+    drawBackground();
+
+    enemies.forEach(drawEnemy);
+
+    drawPlayerBullets();
+
+    drawEnemyBullets();
+
+    drawPlayer();
+
+}
+
+
+/* =========================================================
+   遊戲主迴圈
+========================================================= */
+
+function gameLoop(currentTime) {
+
+    if (!gameRunning) {
+        return;
+    }
+
+    let delta =
+        (currentTime - lastTime) / 1000;
+
+    lastTime = currentTime;
+
+    /* 避免瀏覽器切換分頁後時間跳太大 */
+
+    delta =
+        Math.min(delta, 0.033);
+
+
+    updatePlayer(delta);
+
+    updatePlayerBullets(delta);
+
+    updateEnemies(delta);
+
+    updateEnemyBullets(delta);
+
+    handleCollisions();
+
+    if (!gameRunning) {
+        drawGame();
+        return;
+    }
+
+    checkWave();
+
+    drawGame();
+
+    animationId =
+        requestAnimationFrame(gameLoop);
+
+}
+
+
+/* ---------------------------------------------------------
+   按鈕
+--------------------------------------------------------- */
+
+startButton.addEventListener(
+    "click",
+    startGame
+);
+
+restartButton.addEventListener(
+    "click",
+    startGame
+);
+
+
+/* ---------------------------------------------------------
+   初始設定
+--------------------------------------------------------- */
+
+resizeCanvas();
+
+updateHUD();
+
+createEnemies();
+
+drawGame();
+
+</script>
+
+</body>
+</html>
