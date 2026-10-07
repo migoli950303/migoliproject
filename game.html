@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -33,7 +34,6 @@
             linear-gradient(#09001c, #16002f 55%, #05000d);
     }
 
-    /* 背景星星 */
     body::before {
         content: "";
         position: fixed;
@@ -59,7 +59,6 @@
         }
     }
 
-    /* 主遊戲區 */
     #gameWrapper {
         width: min(96vw, 1000px);
         height: min(94vh, 850px);
@@ -70,7 +69,6 @@
         justify-content: center;
     }
 
-    /* 回首頁 */
     #homeLink {
         position: absolute;
         left: 0;
@@ -103,7 +101,6 @@
         transform: translateY(-2px);
     }
 
-    /* 標題 */
     #title {
         margin-top: 38px;
         margin-bottom: 8px;
@@ -144,7 +141,6 @@
             0 0 12px #00ffff;
     }
 
-    /* HUD */
     #hud {
         width: min(92vw, 850px);
         display: flex;
@@ -184,7 +180,6 @@
             0 0 12px #ff4fda;
     }
 
-    /* Canvas 外框 */
     #canvasContainer {
         position: relative;
         width: min(92vw, 850px);
@@ -217,7 +212,6 @@
         background-size: 100% 4px;
     }
 
-    /* 掃描線 */
     #canvasContainer::after {
         content: "";
         position: absolute;
@@ -232,7 +226,6 @@
         );
     }
 
-    /* 開始 / 結束畫面 */
     .overlay {
         position: absolute;
         inset: 0;
@@ -251,6 +244,7 @@
             );
 
         text-align: center;
+        padding: 20px;
     }
 
     .overlay.hidden {
@@ -299,6 +293,7 @@
         text-shadow: 0 0 6px #00ffff;
 
         transition: 0.15s;
+        margin: 5px;
     }
 
     .pixelButton:hover {
@@ -318,7 +313,148 @@
             0 0 10px #00ffff;
     }
 
-    /* 手機控制器 */
+    /* =====================================================
+       暱稱輸入
+    ===================================================== */
+
+    #nameInputBox {
+        width: min(85%, 400px);
+        text-align: center;
+    }
+
+    #nameInput {
+        width: 100%;
+        padding: 12px;
+
+        border: 3px solid #00ffff;
+        outline: none;
+
+        background: #080018;
+        color: #fff;
+
+        font-family: "Courier New", monospace;
+        font-size: 18px;
+        text-align: center;
+
+        box-shadow:
+            0 0 10px #00ffff,
+            inset 0 0 10px rgba(0, 255, 255, 0.15);
+
+        margin-bottom: 12px;
+    }
+
+    #nameInput:focus {
+        border-color: #ff3cf7;
+
+        box-shadow:
+            0 0 15px #ff3cf7,
+            inset 0 0 10px rgba(255, 0, 220, 0.15);
+    }
+
+    #uploadStatus {
+        min-height: 22px;
+        color: #00ffff;
+        font-size: 13px;
+        margin-top: 5px;
+    }
+
+    /* =====================================================
+       排行榜
+    ===================================================== */
+
+    #leaderboardOverlay {
+        overflow-y: auto;
+    }
+
+    #leaderboardBox {
+        width: min(92%, 520px);
+        max-height: 75%;
+        overflow-y: auto;
+
+        border: 3px solid #ff38dc;
+
+        background: rgba(5, 0, 20, 0.95);
+
+        box-shadow:
+            0 0 15px #ff00d4,
+            inset 0 0 20px rgba(255, 0, 212, 0.12);
+
+        padding: 12px;
+    }
+
+    #leaderboardTitle {
+        color: #ff44e8;
+        font-size: 28px;
+        font-weight: bold;
+        text-align: center;
+
+        margin-bottom: 12px;
+
+        text-shadow:
+            0 0 8px #ff00d9,
+            0 0 18px #ff00d9;
+    }
+
+    .rankRow {
+        display: grid;
+        grid-template-columns: 55px 1fr 100px;
+
+        align-items: center;
+
+        min-height: 38px;
+
+        border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+
+        color: #fff;
+
+        font-size: 14px;
+    }
+
+    .rankRow:last-child {
+        border-bottom: none;
+    }
+
+    .rankNumber {
+        color: #ff45dc;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .rankName {
+        color: #00ffff;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        padding-left: 8px;
+    }
+
+    .rankScore {
+        color: #fff;
+        text-align: right;
+        font-weight: bold;
+        padding-right: 8px;
+    }
+
+    .rankTop {
+        color: #ffe600;
+        text-shadow:
+            0 0 5px #ffe600,
+            0 0 12px #ffe600;
+    }
+
+    #leaderboardLoading {
+        text-align: center;
+        color: #00ffff;
+        padding: 20px;
+    }
+
+    #leaderboardError {
+        text-align: center;
+        color: #ff4fda;
+        padding: 20px;
+        display: none;
+    }
+
     #mobileControls {
         display: none;
 
@@ -373,8 +509,8 @@
         text-align: center;
     }
 
-    /* 手機 */
     @media (max-width: 700px) {
+
         #gameWrapper {
             width: 100vw;
             height: 100vh;
@@ -420,10 +556,19 @@
         #hint {
             display: none;
         }
+
+        .rankRow {
+            grid-template-columns: 45px 1fr 80px;
+            font-size: 12px;
+        }
+
+        #leaderboardTitle {
+            font-size: 22px;
+        }
     }
 
-    /* 非常小的手機 */
     @media (max-height: 650px) {
+
         #title {
             font-size: 21px;
             margin-top: 35px;
@@ -443,6 +588,7 @@
     }
 
     @media (pointer: coarse) {
+
         #mobileControls {
             display: grid;
         }
@@ -462,9 +608,12 @@
 
     <div id="title">銀河入侵者</div>
 
-    <div id="subtitle">SPACE INVADERS // SYNTHWAVE EDITION</div>
+    <div id="subtitle">
+        SPACE INVADERS // SYNTHWAVE EDITION
+    </div>
 
     <div id="hud">
+
         <div class="hudItem">
             分數：
             <span id="scoreValue" class="hudValue">0</span>
@@ -484,13 +633,18 @@
             生命：
             <span id="livesValue">♥ ♥ ♥</span>
         </div>
+
     </div>
 
     <div id="canvasContainer">
 
         <canvas id="gameCanvas"></canvas>
 
-        <!-- 開始畫面 -->
+
+        <!-- =================================================
+             開始畫面
+        ================================================== -->
+
         <div id="startOverlay" class="overlay">
 
             <div class="overlayTitle">
@@ -506,9 +660,17 @@
                 開始遊戲
             </button>
 
+            <button id="showLeaderboardButton" class="pixelButton">
+                雲端排行榜
+            </button>
+
         </div>
 
-        <!-- 遊戲結束 -->
+
+        <!-- =================================================
+             遊戲結束
+        ================================================== -->
+
         <div id="gameOverOverlay" class="overlay hidden">
 
             <div class="overlayTitle">
@@ -516,22 +678,97 @@
             </div>
 
             <div class="overlayText">
+
                 最終分數：
                 <span id="finalScore">0</span>
+
                 <br>
+
                 最高分：
                 <span id="finalHighScore">0</span>
+
             </div>
 
-            <button id="restartButton" class="pixelButton">
-                重新開始
+            <div id="nameInputBox">
+
+                <input
+                    id="nameInput"
+                    type="text"
+                    maxlength="20"
+                    placeholder="輸入你的暱稱"
+                    autocomplete="off"
+                >
+
+                <button
+                    id="submitScoreButton"
+                    class="pixelButton">
+                    上傳分數
+                </button>
+
+                <div id="uploadStatus"></div>
+
+            </div>
+
+            <div>
+
+                <button
+                    id="restartButton"
+                    class="pixelButton">
+                    重新開始
+                </button>
+
+                <button
+                    id="gameOverLeaderboardButton"
+                    class="pixelButton">
+                    查看排行榜
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             排行榜
+        ================================================== -->
+
+        <div
+            id="leaderboardOverlay"
+            class="overlay hidden">
+
+            <div id="leaderboardBox">
+
+                <div id="leaderboardTitle">
+                    ★ 雲端排行榜 ★
+                </div>
+
+                <div id="leaderboardLoading">
+                    正在讀取排行榜...
+                </div>
+
+                <div id="leaderboardError">
+                    排行榜讀取失敗
+                </div>
+
+                <div id="leaderboardList"></div>
+
+            </div>
+
+            <button
+                id="closeLeaderboardButton"
+                class="pixelButton">
+                返回
             </button>
 
         </div>
 
     </div>
 
-    <!-- 手機控制 -->
+
+    <!-- =====================================================
+         手機控制
+    ====================================================== -->
+
     <div id="mobileControls">
 
         <button
@@ -565,47 +802,122 @@
 
 
 <script>
+
 /* =========================================================
    銀河入侵者
-   所有程式都放在這個 HTML 中
+   Google 試算表雲端排行榜版本
 ========================================================= */
 
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
 
-/* ---------------------------------------------------------
+/* =========================================================
+   Google Apps Script API
+========================================================= */
+
+const LEADERBOARD_API =
+    "https://script.google.com/macros/s/AKfycbwaWU3-auFkxblwxcQcaSzLW0U8c8oqUHPtIQuKDdjj-jdUZL36mj0IveT096CaZe8I/exec";
+
+
+/* =========================================================
+   Canvas
+========================================================= */
+
+const canvas =
+    document.getElementById("gameCanvas");
+
+const ctx =
+    canvas.getContext("2d");
+
+
+/* =========================================================
    UI
---------------------------------------------------------- */
+========================================================= */
 
-const scoreValue = document.getElementById("scoreValue");
-const highScoreValue = document.getElementById("highScoreValue");
-const livesValue = document.getElementById("livesValue");
-const waveValue = document.getElementById("waveValue");
+const scoreValue =
+    document.getElementById("scoreValue");
 
-const startOverlay = document.getElementById("startOverlay");
-const gameOverOverlay = document.getElementById("gameOverOverlay");
+const highScoreValue =
+    document.getElementById("highScoreValue");
 
-const startButton = document.getElementById("startButton");
-const restartButton = document.getElementById("restartButton");
+const livesValue =
+    document.getElementById("livesValue");
 
-const finalScore = document.getElementById("finalScore");
-const finalHighScore = document.getElementById("finalHighScore");
+const waveValue =
+    document.getElementById("waveValue");
 
-/* ---------------------------------------------------------
+const startOverlay =
+    document.getElementById("startOverlay");
+
+const gameOverOverlay =
+    document.getElementById("gameOverOverlay");
+
+const leaderboardOverlay =
+    document.getElementById("leaderboardOverlay");
+
+const startButton =
+    document.getElementById("startButton");
+
+const restartButton =
+    document.getElementById("restartButton");
+
+const showLeaderboardButton =
+    document.getElementById("showLeaderboardButton");
+
+const gameOverLeaderboardButton =
+    document.getElementById("gameOverLeaderboardButton");
+
+const closeLeaderboardButton =
+    document.getElementById("closeLeaderboardButton");
+
+const finalScore =
+    document.getElementById("finalScore");
+
+const finalHighScore =
+    document.getElementById("finalHighScore");
+
+const nameInput =
+    document.getElementById("nameInput");
+
+const submitScoreButton =
+    document.getElementById("submitScoreButton");
+
+const uploadStatus =
+    document.getElementById("uploadStatus");
+
+const leaderboardList =
+    document.getElementById("leaderboardList");
+
+const leaderboardLoading =
+    document.getElementById("leaderboardLoading");
+
+const leaderboardError =
+    document.getElementById("leaderboardError");
+
+
+/* =========================================================
    Canvas 尺寸
---------------------------------------------------------- */
+========================================================= */
 
 let WIDTH = 800;
+
 let HEIGHT = 600;
+
 
 function resizeCanvas() {
 
-    const rect = canvas.getBoundingClientRect();
+    const rect =
+        canvas.getBoundingClientRect();
 
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const dpr =
+        Math.min(
+            window.devicePixelRatio || 1,
+            2
+        );
 
-    canvas.width = Math.floor(rect.width * dpr);
-    canvas.height = Math.floor(rect.height * dpr);
+    canvas.width =
+        Math.floor(rect.width * dpr);
+
+    canvas.height =
+        Math.floor(rect.height * dpr);
 
     ctx.setTransform(
         canvas.width / WIDTH,
@@ -615,21 +927,30 @@ function resizeCanvas() {
         0,
         0
     );
+
 }
 
-window.addEventListener("resize", resizeCanvas);
+
+window.addEventListener(
+    "resize",
+    resizeCanvas
+);
 
 
-/* ---------------------------------------------------------
+/* =========================================================
    遊戲狀態
---------------------------------------------------------- */
+========================================================= */
 
 let gameRunning = false;
 
 let score = 0;
 
 let highScore =
-    Number(localStorage.getItem("spaceInvadersHighScore")) || 0;
+    Number(
+        localStorage.getItem(
+            "spaceInvadersHighScore"
+        )
+    ) || 0;
 
 let lives = 3;
 
@@ -640,9 +961,9 @@ let lastTime = 0;
 let animationId = null;
 
 
-/* ---------------------------------------------------------
+/* =========================================================
    玩家
---------------------------------------------------------- */
+========================================================= */
 
 const player = {
 
@@ -665,18 +986,18 @@ const player = {
 };
 
 
-/* ---------------------------------------------------------
+/* =========================================================
    子彈
---------------------------------------------------------- */
+========================================================= */
 
 let playerBullets = [];
 
 let enemyBullets = [];
 
 
-/* ---------------------------------------------------------
+/* =========================================================
    敵人
---------------------------------------------------------- */
+========================================================= */
 
 let enemies = [];
 
@@ -691,9 +1012,9 @@ let enemyDropDistance = 25;
 let enemyShootTimer = 0;
 
 
-/* ---------------------------------------------------------
-   鍵盤控制
---------------------------------------------------------- */
+/* =========================================================
+   鍵盤
+========================================================= */
 
 const keys = {
 
@@ -705,53 +1026,82 @@ const keys = {
 
 };
 
-document.addEventListener("keydown", function(event) {
 
-    if (
-        event.code === "ArrowLeft" ||
-        event.code === "ArrowRight" ||
-        event.code === "Space"
-    ) {
-        event.preventDefault();
+document.addEventListener(
+    "keydown",
+    function(event) {
+
+        if (
+            event.code === "ArrowLeft" ||
+            event.code === "ArrowRight" ||
+            event.code === "Space"
+        ) {
+
+            event.preventDefault();
+
+        }
+
+
+        if (event.code === "ArrowLeft") {
+
+            keys.left = true;
+
+        }
+
+
+        if (event.code === "ArrowRight") {
+
+            keys.right = true;
+
+        }
+
+
+        if (event.code === "Space") {
+
+            keys.shoot = true;
+
+        }
+
     }
+);
 
-    if (event.code === "ArrowLeft") {
-        keys.left = true;
+
+document.addEventListener(
+    "keyup",
+    function(event) {
+
+        if (event.code === "ArrowLeft") {
+
+            keys.left = false;
+
+        }
+
+
+        if (event.code === "ArrowRight") {
+
+            keys.right = false;
+
+        }
+
+
+        if (event.code === "Space") {
+
+            keys.shoot = false;
+
+        }
+
     }
-
-    if (event.code === "ArrowRight") {
-        keys.right = true;
-    }
-
-    if (event.code === "Space") {
-        keys.shoot = true;
-    }
-
-});
+);
 
 
-document.addEventListener("keyup", function(event) {
+/* =========================================================
+   手機控制
+========================================================= */
 
-    if (event.code === "ArrowLeft") {
-        keys.left = false;
-    }
-
-    if (event.code === "ArrowRight") {
-        keys.right = false;
-    }
-
-    if (event.code === "Space") {
-        keys.shoot = false;
-    }
-
-});
-
-
-/* ---------------------------------------------------------
-   手機觸控
---------------------------------------------------------- */
-
-function setupTouchButton(element, keyName) {
+function setupTouchButton(
+    element,
+    keyName
+) {
 
     element.addEventListener(
         "pointerdown",
@@ -764,6 +1114,7 @@ function setupTouchButton(element, keyName) {
         }
     );
 
+
     element.addEventListener(
         "pointerup",
         function(event) {
@@ -775,6 +1126,7 @@ function setupTouchButton(element, keyName) {
         }
     );
 
+
     element.addEventListener(
         "pointercancel",
         function() {
@@ -784,6 +1136,7 @@ function setupTouchButton(element, keyName) {
         }
     );
 
+
     element.addEventListener(
         "pointerleave",
         function() {
@@ -792,6 +1145,7 @@ function setupTouchButton(element, keyName) {
 
         }
     );
+
 }
 
 
@@ -811,15 +1165,19 @@ setupTouchButton(
 );
 
 
-/* ---------------------------------------------------------
+/* =========================================================
    建立敵人
---------------------------------------------------------- */
+========================================================= */
 
 function createEnemies() {
 
     enemies = [];
 
-    const rows = Math.min(3 + wave, 6);
+    const rows =
+        Math.min(
+            3 + wave,
+            6
+        );
 
     const columns = 9;
 
@@ -840,30 +1198,53 @@ function createEnemies() {
 
     const startY = 70;
 
-    for (let row = 0; row < rows; row++) {
 
-        for (let col = 0; col < columns; col++) {
+    for (
+        let row = 0;
+        row < rows;
+        row++
+    ) {
 
-            let type = row % 3;
+        for (
+            let col = 0;
+            col < columns;
+            col++
+        ) {
+
+            let type =
+                row % 3;
+
 
             enemies.push({
 
-                x: startX + col * (enemyWidth + gapX),
+                x:
+                    startX +
+                    col *
+                    (enemyWidth + gapX),
 
-                y: startY + row * (enemyHeight + gapY),
+                y:
+                    startY +
+                    row *
+                    (enemyHeight + gapY),
 
-                width: enemyWidth,
+                width:
+                    enemyWidth,
 
-                height: enemyHeight,
+                height:
+                    enemyHeight,
 
-                type: type,
+                type:
+                    type,
 
-                alive: true,
+                alive:
+                    true,
 
                 points:
-                    type === 0 ? 30 :
-                    type === 1 ? 20 :
-                    10
+                    type === 0
+                        ? 30
+                        : type === 1
+                            ? 20
+                            : 10
 
             });
 
@@ -871,19 +1252,23 @@ function createEnemies() {
 
     }
 
+
     enemyDirection = 1;
 
     enemyMoveTimer = 0;
 
     enemyMoveDelay =
-        Math.max(0.12, 0.5 - wave * 0.025);
+        Math.max(
+            0.12,
+            0.5 - wave * 0.025
+        );
 
 }
 
 
-/* ---------------------------------------------------------
+/* =========================================================
    重設遊戲
---------------------------------------------------------- */
+========================================================= */
 
 function resetGame() {
 
@@ -893,9 +1278,11 @@ function resetGame() {
 
     wave = 1;
 
-    player.x = WIDTH / 2;
+    player.x =
+        WIDTH / 2;
 
-    player.y = HEIGHT - 60;
+    player.y =
+        HEIGHT - 60;
 
     player.cooldown = 0;
 
@@ -912,9 +1299,9 @@ function resetGame() {
 }
 
 
-/* ---------------------------------------------------------
+/* =========================================================
    開始遊戲
---------------------------------------------------------- */
+========================================================= */
 
 function startGame() {
 
@@ -922,26 +1309,43 @@ function startGame() {
 
     gameRunning = true;
 
-    startOverlay.classList.add("hidden");
+    startOverlay.classList.add(
+        "hidden"
+    );
 
-    gameOverOverlay.classList.add("hidden");
+    gameOverOverlay.classList.add(
+        "hidden"
+    );
 
-    lastTime = performance.now();
+    leaderboardOverlay.classList.add(
+        "hidden"
+    );
 
-    cancelAnimationFrame(animationId);
+    uploadStatus.textContent = "";
 
-    animationId = requestAnimationFrame(gameLoop);
+    lastTime =
+        performance.now();
+
+    cancelAnimationFrame(
+        animationId
+    );
+
+    animationId =
+        requestAnimationFrame(
+            gameLoop
+        );
 
 }
 
 
-/* ---------------------------------------------------------
+/* =========================================================
    遊戲結束
---------------------------------------------------------- */
+========================================================= */
 
 function endGame() {
 
     gameRunning = false;
+
 
     if (score > highScore) {
 
@@ -954,127 +1358,192 @@ function endGame() {
 
     }
 
-    finalScore.textContent = score;
 
-    finalHighScore.textContent = highScore;
+    finalScore.textContent =
+        score;
+
+    finalHighScore.textContent =
+        highScore;
+
+    nameInput.value = "";
+
+    uploadStatus.textContent = "";
+
+    submitScoreButton.disabled = false;
+
+    submitScoreButton.textContent =
+        "上傳分數";
+
 
     updateHUD();
 
-    gameOverOverlay.classList.remove("hidden");
+
+    gameOverOverlay.classList.remove(
+        "hidden"
+    );
 
 }
 
 
-/* ---------------------------------------------------------
+/* =========================================================
    HUD
---------------------------------------------------------- */
+========================================================= */
 
 function updateHUD() {
 
-    scoreValue.textContent = score;
+    scoreValue.textContent =
+        score;
 
-    highScoreValue.textContent = highScore;
+    highScoreValue.textContent =
+        highScore;
 
-    waveValue.textContent = wave;
+    waveValue.textContent =
+        wave;
 
     livesValue.textContent =
-        "♥ ".repeat(Math.max(0, lives)).trim();
+        "♥ ".repeat(
+            Math.max(0, lives)
+        ).trim();
 
 }
 
 
-/* ---------------------------------------------------------
+/* =========================================================
    玩家射擊
---------------------------------------------------------- */
+========================================================= */
 
 function playerShoot() {
 
     if (player.cooldown > 0) {
+
         return;
+
     }
+
 
     playerBullets.push({
 
-        x: player.x,
+        x:
+            player.x,
 
-        y: player.y - player.height / 2,
+        y:
+            player.y -
+            player.height / 2,
 
-        width: 5,
+        width:
+            5,
 
-        height: 18,
+        height:
+            18,
 
-        speed: 650
+        speed:
+            650
 
     });
 
-    player.cooldown = player.shootDelay;
+
+    player.cooldown =
+        player.shootDelay;
 
 }
 
 
-/* ---------------------------------------------------------
+/* =========================================================
    敵人射擊
---------------------------------------------------------- */
+========================================================= */
 
 function enemyShoot() {
 
     const aliveEnemies =
-        enemies.filter(enemy => enemy.alive);
+        enemies.filter(
+            enemy =>
+                enemy.alive
+        );
 
-    if (aliveEnemies.length === 0) {
+
+    if (
+        aliveEnemies.length === 0
+    ) {
+
         return;
+
     }
 
-    /* 優先選擇比較下面的敵人 */
 
     const columns = {};
 
-    aliveEnemies.forEach(enemy => {
 
-        const column =
-            Math.round(enemy.x / 50);
+    aliveEnemies.forEach(
+        enemy => {
 
-        if (
-            !columns[column] ||
-            enemy.y > columns[column].y
-        ) {
-            columns[column] = enemy;
+            const column =
+                Math.round(
+                    enemy.x / 50
+                );
+
+
+            if (
+                !columns[column] ||
+                enemy.y >
+                columns[column].y
+            ) {
+
+                columns[column] =
+                    enemy;
+
+            }
+
         }
+    );
 
-    });
 
     const shooters =
-        Object.values(columns);
+        Object.values(
+            columns
+        );
+
 
     const shooter =
         shooters[
-            Math.floor(Math.random() * shooters.length)
+            Math.floor(
+                Math.random() *
+                shooters.length
+            )
         ];
+
 
     enemyBullets.push({
 
-        x: shooter.x,
+        x:
+            shooter.x,
 
-        y: shooter.y + shooter.height / 2,
+        y:
+            shooter.y +
+            shooter.height / 2,
 
-        width: 5,
+        width:
+            5,
 
-        height: 15,
+        height:
+            15,
 
-        speed: 230 + wave * 10
+        speed:
+            230 +
+            wave * 10
 
     });
 
 }
 
 
-/* ---------------------------------------------------------
+/* =========================================================
    碰撞
---------------------------------------------------------- */
+========================================================= */
 
 function isColliding(a, b) {
 
     return (
+
         a.x - a.width / 2 <
         b.x + b.width / 2 &&
 
@@ -1086,33 +1555,39 @@ function isColliding(a, b) {
 
         a.y + a.height / 2 >
         b.y - b.height / 2
+
     );
 
 }
 
 
-/* ---------------------------------------------------------
-   更新玩家
---------------------------------------------------------- */
+/* =========================================================
+   玩家更新
+========================================================= */
 
 function updatePlayer(delta) {
 
     if (keys.left) {
 
         player.x -=
-            player.speed * delta;
+            player.speed *
+            delta;
 
     }
+
 
     if (keys.right) {
 
         player.x +=
-            player.speed * delta;
+            player.speed *
+            delta;
 
     }
 
+
     const halfWidth =
         player.width / 2;
+
 
     player.x =
         Math.max(
@@ -1123,17 +1598,22 @@ function updatePlayer(delta) {
             )
         );
 
+
     if (player.cooldown > 0) {
 
-        player.cooldown -= delta;
+        player.cooldown -=
+            delta;
 
     }
+
 
     if (player.invincible > 0) {
 
-        player.invincible -= delta;
+        player.invincible -=
+            delta;
 
     }
+
 
     if (keys.shoot) {
 
@@ -1144,96 +1624,133 @@ function updatePlayer(delta) {
 }
 
 
-/* ---------------------------------------------------------
-   更新玩家子彈
---------------------------------------------------------- */
+/* =========================================================
+   玩家子彈
+========================================================= */
 
 function updatePlayerBullets(delta) {
 
-    playerBullets.forEach(bullet => {
+    playerBullets.forEach(
+        bullet => {
 
-        bullet.y -=
-            bullet.speed * delta;
+            bullet.y -=
+                bullet.speed *
+                delta;
 
-    });
+        }
+    );
+
 
     playerBullets =
         playerBullets.filter(
-            bullet => bullet.y > -30
+            bullet =>
+                bullet.y > -30
         );
 
 }
 
 
-/* ---------------------------------------------------------
-   更新敵人
---------------------------------------------------------- */
+/* =========================================================
+   敵人更新
+========================================================= */
 
 function updateEnemies(delta) {
 
-    enemyMoveTimer += delta;
+    enemyMoveTimer +=
+        delta;
 
-    if (enemyMoveTimer >= enemyMoveDelay) {
+
+    if (
+        enemyMoveTimer >=
+        enemyMoveDelay
+    ) {
 
         enemyMoveTimer = 0;
 
         let hitEdge = false;
 
+
         const aliveEnemies =
-            enemies.filter(enemy => enemy.alive);
+            enemies.filter(
+                enemy =>
+                    enemy.alive
+            );
 
-        aliveEnemies.forEach(enemy => {
 
-            const nextX =
-                enemy.x +
-                enemyDirection * 20;
+        aliveEnemies.forEach(
+            enemy => {
 
-            if (
-                nextX - enemy.width / 2 < 20 ||
-                nextX + enemy.width / 2 >
-                WIDTH - 20
-            ) {
+                const nextX =
+                    enemy.x +
+                    enemyDirection *
+                    20;
 
-                hitEdge = true;
+
+                if (
+                    nextX -
+                    enemy.width / 2 <
+                    20 ||
+
+                    nextX +
+                    enemy.width / 2 >
+                    WIDTH - 20
+                ) {
+
+                    hitEdge = true;
+
+                }
 
             }
+        );
 
-        });
 
         if (hitEdge) {
 
             enemyDirection *= -1;
 
-            aliveEnemies.forEach(enemy => {
 
-                enemy.y += enemyDropDistance;
+            aliveEnemies.forEach(
+                enemy => {
 
-            });
+                    enemy.y +=
+                        enemyDropDistance;
+
+                }
+            );
 
         } else {
 
-            aliveEnemies.forEach(enemy => {
+            aliveEnemies.forEach(
+                enemy => {
 
-                enemy.x +=
-                    enemyDirection * 20;
+                    enemy.x +=
+                        enemyDirection *
+                        20;
 
-            });
+                }
+            );
 
         }
 
     }
 
-    /* 敵人射擊 */
 
-    enemyShootTimer += delta;
+    enemyShootTimer +=
+        delta;
+
 
     const shootInterval =
         Math.max(
             0.35,
-            1.4 - wave * 0.08
+            1.4 -
+            wave * 0.08
         );
 
-    if (enemyShootTimer >= shootInterval) {
+
+    if (
+        enemyShootTimer >=
+        shootInterval
+    ) {
 
         enemyShootTimer = 0;
 
@@ -1244,61 +1761,101 @@ function updateEnemies(delta) {
 }
 
 
-/* ---------------------------------------------------------
-   更新敵人子彈
---------------------------------------------------------- */
+/* =========================================================
+   敵人子彈
+========================================================= */
 
 function updateEnemyBullets(delta) {
 
-    enemyBullets.forEach(bullet => {
+    enemyBullets.forEach(
+        bullet => {
 
-        bullet.y +=
-            bullet.speed * delta;
+            bullet.y +=
+                bullet.speed *
+                delta;
 
-    });
+        }
+    );
+
 
     enemyBullets =
         enemyBullets.filter(
-            bullet => bullet.y < HEIGHT + 30
+            bullet =>
+                bullet.y <
+                HEIGHT + 30
         );
 
 }
 
 
-/* ---------------------------------------------------------
-   處理碰撞
---------------------------------------------------------- */
+/* =========================================================
+   碰撞處理
+========================================================= */
 
 function handleCollisions() {
 
-    /* 玩家子彈 vs 敵人 */
 
-    for (let i = playerBullets.length - 1; i >= 0; i--) {
+    /* -----------------------------------------------------
+       玩家子彈 vs 敵人
+    ----------------------------------------------------- */
+
+    for (
+        let i =
+            playerBullets.length - 1;
+
+        i >= 0;
+
+        i--
+    ) {
 
         const bullet =
             playerBullets[i];
 
         let hit = false;
 
-        for (let j = 0; j < enemies.length; j++) {
 
-            const enemy = enemies[j];
+        for (
+            let j = 0;
+            j < enemies.length;
+            j++
+        ) {
+
+            const enemy =
+                enemies[j];
+
 
             if (!enemy.alive) {
+
                 continue;
+
             }
 
-            if (isColliding(bullet, enemy)) {
 
-                enemy.alive = false;
+            if (
+                isColliding(
+                    bullet,
+                    enemy
+                )
+            ) {
 
-                score += enemy.points;
+                enemy.alive =
+                    false;
 
-                playerBullets.splice(i, 1);
+                score +=
+                    enemy.points;
+
+
+                playerBullets.splice(
+                    i,
+                    1
+                );
+
 
                 hit = true;
 
+
                 updateHUD();
+
 
                 break;
 
@@ -1306,35 +1863,58 @@ function handleCollisions() {
 
         }
 
+
         if (hit) {
+
             continue;
+
         }
 
     }
 
 
-    /* 敵人子彈 vs 玩家 */
+    /* -----------------------------------------------------
+       敵人子彈 vs 玩家
+    ----------------------------------------------------- */
 
-    if (player.invincible <= 0) {
+    if (
+        player.invincible <= 0
+    ) {
 
         for (
-            let i = enemyBullets.length - 1;
+            let i =
+                enemyBullets.length - 1;
+
             i >= 0;
+
             i--
         ) {
 
             const bullet =
                 enemyBullets[i];
 
-            if (isColliding(bullet, player)) {
 
-                enemyBullets.splice(i, 1);
+            if (
+                isColliding(
+                    bullet,
+                    player
+                )
+            ) {
+
+                enemyBullets.splice(
+                    i,
+                    1
+                );
+
 
                 lives--;
 
-                player.invincible = 1.2;
+                player.invincible =
+                    1.2;
+
 
                 updateHUD();
+
 
                 if (lives <= 0) {
 
@@ -1344,6 +1924,7 @@ function handleCollisions() {
 
                 }
 
+
                 break;
 
             }
@@ -1353,12 +1934,21 @@ function handleCollisions() {
     }
 
 
-    /* 敵人碰到玩家 / 防線 */
+    /* -----------------------------------------------------
+       敵人碰到防線
+    ----------------------------------------------------- */
 
     const aliveEnemies =
-        enemies.filter(enemy => enemy.alive);
+        enemies.filter(
+            enemy =>
+                enemy.alive
+        );
 
-    for (const enemy of aliveEnemies) {
+
+    for (
+        const enemy of
+        aliveEnemies
+    ) {
 
         if (
             enemy.y +
@@ -1377,20 +1967,25 @@ function handleCollisions() {
 }
 
 
-/* ---------------------------------------------------------
+/* =========================================================
    下一波
---------------------------------------------------------- */
+========================================================= */
 
 function checkWave() {
 
     const remaining =
-        enemies.some(enemy => enemy.alive);
+        enemies.some(
+            enemy =>
+                enemy.alive
+        );
+
 
     if (!remaining) {
 
         wave++;
 
-        score += 100 * wave;
+        score +=
+            100 * wave;
 
         playerBullets = [];
 
@@ -1406,16 +2001,14 @@ function checkWave() {
 
 
 /* =========================================================
-   繪圖
+   背景
 ========================================================= */
-
-/* ---------------------------------------------------------
-   畫背景
---------------------------------------------------------- */
 
 function drawBackground() {
 
-    ctx.fillStyle = "#020008";
+    ctx.fillStyle =
+        "#020008";
+
 
     ctx.fillRect(
         0,
@@ -1425,29 +2018,48 @@ function drawBackground() {
     );
 
 
-    /* 星星 */
-
     const starSeed = 100;
 
-    for (let i = 0; i < starSeed; i++) {
+
+    for (
+        let i = 0;
+        i < starSeed;
+        i++
+    ) {
 
         const x =
-            (i * 97) % WIDTH;
+            (i * 97) %
+            WIDTH;
+
 
         const y =
-            (i * 53 + Math.floor(performance.now() / 80)) %
+            (
+                i * 53 +
+                Math.floor(
+                    performance.now() /
+                    80
+                )
+            ) %
             HEIGHT;
 
+
         const size =
-            i % 5 === 0 ? 2 : 1;
+            i % 5 === 0
+                ? 2
+                : 1;
+
 
         ctx.fillStyle =
             i % 4 === 0
                 ? "#ff44dd"
                 : "#00ffff";
 
+
         ctx.globalAlpha =
-            0.3 + (i % 5) * 0.1;
+            0.3 +
+            (i % 5) *
+            0.1;
+
 
         ctx.fillRect(
             x,
@@ -1458,18 +2070,20 @@ function drawBackground() {
 
     }
 
+
     ctx.globalAlpha = 1;
 
-
-    /* 地平線 */
 
     const horizon =
         HEIGHT - 105;
 
+
     ctx.strokeStyle =
         "rgba(255, 0, 220, 0.35)";
 
+
     ctx.lineWidth = 2;
+
 
     for (
         let y = horizon;
@@ -1479,16 +2093,20 @@ function drawBackground() {
 
         ctx.beginPath();
 
-        ctx.moveTo(0, y);
+        ctx.moveTo(
+            0,
+            y
+        );
 
-        ctx.lineTo(WIDTH, y);
+        ctx.lineTo(
+            WIDTH,
+            y
+        );
 
         ctx.stroke();
 
     }
 
-
-    /* 地面透視線 */
 
     for (
         let x = -WIDTH;
@@ -1517,45 +2135,61 @@ function drawBackground() {
     ctx.strokeStyle =
         "rgba(0, 255, 255, 0.25)";
 
+
     ctx.beginPath();
 
-    ctx.moveTo(0, horizon);
+    ctx.moveTo(
+        0,
+        horizon
+    );
 
-    ctx.lineTo(WIDTH, horizon);
+    ctx.lineTo(
+        WIDTH,
+        horizon
+    );
 
     ctx.stroke();
 
 }
 
 
-/* ---------------------------------------------------------
-   畫玩家
---------------------------------------------------------- */
+/* =========================================================
+   玩家繪圖
+========================================================= */
 
 function drawPlayer() {
 
     if (
         player.invincible > 0 &&
-        Math.floor(player.invincible * 12) % 2 === 0
+        Math.floor(
+            player.invincible * 12
+        ) % 2 === 0
     ) {
+
         return;
+
     }
 
-    const x = player.x;
 
-    const y = player.y;
+    const x =
+        player.x;
+
+    const y =
+        player.y;
 
 
     ctx.save();
 
-    ctx.shadowColor = "#00ffff";
+
+    ctx.shadowColor =
+        "#00ffff";
 
     ctx.shadowBlur = 15;
 
 
-    /* 船身 */
+    ctx.fillStyle =
+        "#00ffff";
 
-    ctx.fillStyle = "#00ffff";
 
     ctx.fillRect(
         x - 23,
@@ -1565,9 +2199,9 @@ function drawPlayer() {
     );
 
 
-    /* 船頂 */
+    ctx.fillStyle =
+        "#ff45dc";
 
-    ctx.fillStyle = "#ff45dc";
 
     ctx.fillRect(
         x - 12,
@@ -1577,9 +2211,9 @@ function drawPlayer() {
     );
 
 
-    /* 駕駛艙 */
+    ctx.fillStyle =
+        "#ffffff";
 
-    ctx.fillStyle = "#ffffff";
 
     ctx.fillRect(
         x - 6,
@@ -1589,9 +2223,9 @@ function drawPlayer() {
     );
 
 
-    /* 左右炮管 */
+    ctx.fillStyle =
+        "#00ffff";
 
-    ctx.fillStyle = "#00ffff";
 
     ctx.fillRect(
         x - 28,
@@ -1599,6 +2233,7 @@ function drawPlayer() {
         7,
         12
     );
+
 
     ctx.fillRect(
         x + 21,
@@ -1608,9 +2243,9 @@ function drawPlayer() {
     );
 
 
-    /* 引擎 */
+    ctx.fillStyle =
+        "#ff00d9";
 
-    ctx.fillStyle = "#ff00d9";
 
     ctx.fillRect(
         x - 15,
@@ -1618,6 +2253,7 @@ function drawPlayer() {
         8,
         8
     );
+
 
     ctx.fillRect(
         x + 7,
@@ -1632,19 +2268,24 @@ function drawPlayer() {
 }
 
 
-/* ---------------------------------------------------------
-   畫敵人
---------------------------------------------------------- */
+/* =========================================================
+   敵人繪圖
+========================================================= */
 
 function drawEnemy(enemy) {
 
     if (!enemy.alive) {
+
         return;
+
     }
 
-    const x = enemy.x;
 
-    const y = enemy.y;
+    const x =
+        enemy.x;
+
+    const y =
+        enemy.y;
 
 
     ctx.save();
@@ -1654,37 +2295,50 @@ function drawEnemy(enemy) {
 
     let glowColor;
 
-    if (enemy.type === 0) {
 
-        mainColor = "#ff39d9";
+    if (
+        enemy.type === 0
+    ) {
 
-        glowColor = "#ff00d9";
+        mainColor =
+            "#ff39d9";
 
-    } else if (enemy.type === 1) {
+        glowColor =
+            "#ff00d9";
 
-        mainColor = "#8c52ff";
+    } else if (
+        enemy.type === 1
+    ) {
 
-        glowColor = "#7b00ff";
+        mainColor =
+            "#8c52ff";
+
+        glowColor =
+            "#7b00ff";
 
     } else {
 
-        mainColor = "#00ffff";
+        mainColor =
+            "#00ffff";
 
-        glowColor = "#00ffff";
+        glowColor =
+            "#00ffff";
 
     }
 
 
-    ctx.shadowColor = glowColor;
+    ctx.shadowColor =
+        glowColor;
 
     ctx.shadowBlur = 12;
 
-    ctx.fillStyle = mainColor;
+    ctx.fillStyle =
+        mainColor;
 
 
-    if (enemy.type === 0) {
-
-        /* 螃蟹型 */
+    if (
+        enemy.type === 0
+    ) {
 
         ctx.fillRect(
             x - 17,
@@ -1693,12 +2347,14 @@ function drawEnemy(enemy) {
             17
         );
 
+
         ctx.fillRect(
             x - 22,
             y - 5,
             5,
             10
         );
+
 
         ctx.fillRect(
             x + 17,
@@ -1707,12 +2363,14 @@ function drawEnemy(enemy) {
             10
         );
 
+
         ctx.fillRect(
             x - 12,
             y + 8,
             6,
             5
         );
+
 
         ctx.fillRect(
             x + 6,
@@ -1721,9 +2379,9 @@ function drawEnemy(enemy) {
             5
         );
 
-    } else if (enemy.type === 1) {
-
-        /* UFO 型 */
+    } else if (
+        enemy.type === 1
+    ) {
 
         ctx.fillRect(
             x - 19,
@@ -1732,12 +2390,14 @@ function drawEnemy(enemy) {
             11
         );
 
+
         ctx.fillRect(
             x - 12,
             y - 10,
             24,
             7
         );
+
 
         ctx.fillRect(
             x - 7,
@@ -1746,12 +2406,14 @@ function drawEnemy(enemy) {
             5
         );
 
+
         ctx.fillRect(
             x - 22,
             y + 2,
             5,
             5
         );
+
 
         ctx.fillRect(
             x + 17,
@@ -1762,14 +2424,13 @@ function drawEnemy(enemy) {
 
     } else {
 
-        /* 方塊型 */
-
         ctx.fillRect(
             x - 16,
             y - 12,
             32,
             23
         );
+
 
         ctx.fillRect(
             x - 22,
@@ -1778,6 +2439,7 @@ function drawEnemy(enemy) {
             10
         );
 
+
         ctx.fillRect(
             x + 16,
             y - 6,
@@ -1785,12 +2447,14 @@ function drawEnemy(enemy) {
             10
         );
 
+
         ctx.fillRect(
             x - 10,
             y + 10,
             6,
             6
         );
+
 
         ctx.fillRect(
             x + 4,
@@ -1802,11 +2466,11 @@ function drawEnemy(enemy) {
     }
 
 
-    /* 眼睛 */
-
     ctx.shadowBlur = 0;
 
-    ctx.fillStyle = "#05000b";
+    ctx.fillStyle =
+        "#05000b";
+
 
     ctx.fillRect(
         x - 9,
@@ -1814,6 +2478,7 @@ function drawEnemy(enemy) {
         5,
         6
     );
+
 
     ctx.fillRect(
         x + 4,
@@ -1828,75 +2493,99 @@ function drawEnemy(enemy) {
 }
 
 
-/* ---------------------------------------------------------
-   畫玩家子彈
---------------------------------------------------------- */
+/* =========================================================
+   玩家子彈
+========================================================= */
 
 function drawPlayerBullets() {
 
     ctx.save();
 
-    ctx.shadowColor = "#00ffff";
+    ctx.shadowColor =
+        "#00ffff";
 
     ctx.shadowBlur = 15;
 
-    ctx.fillStyle = "#00ffff";
+    ctx.fillStyle =
+        "#00ffff";
 
-    playerBullets.forEach(bullet => {
 
-        ctx.fillRect(
-            bullet.x - bullet.width / 2,
-            bullet.y - bullet.height / 2,
-            bullet.width,
-            bullet.height
-        );
+    playerBullets.forEach(
+        bullet => {
 
-    });
+            ctx.fillRect(
+                bullet.x -
+                bullet.width / 2,
+
+                bullet.y -
+                bullet.height / 2,
+
+                bullet.width,
+
+                bullet.height
+            );
+
+        }
+    );
+
 
     ctx.restore();
 
 }
 
 
-/* ---------------------------------------------------------
-   畫敵人子彈
---------------------------------------------------------- */
+/* =========================================================
+   敵人子彈
+========================================================= */
 
 function drawEnemyBullets() {
 
     ctx.save();
 
-    ctx.shadowColor = "#ff00dd";
+    ctx.shadowColor =
+        "#ff00dd";
 
     ctx.shadowBlur = 12;
 
-    ctx.fillStyle = "#ff44dd";
+    ctx.fillStyle =
+        "#ff44dd";
 
-    enemyBullets.forEach(bullet => {
 
-        ctx.fillRect(
-            bullet.x - bullet.width / 2,
-            bullet.y - bullet.height / 2,
-            bullet.width,
-            bullet.height
-        );
+    enemyBullets.forEach(
+        bullet => {
 
-    });
+            ctx.fillRect(
+                bullet.x -
+                bullet.width / 2,
+
+                bullet.y -
+                bullet.height / 2,
+
+                bullet.width,
+
+                bullet.height
+            );
+
+        }
+    );
+
 
     ctx.restore();
 
 }
 
 
-/* ---------------------------------------------------------
-   畫遊戲
---------------------------------------------------------- */
+/* =========================================================
+   遊戲繪圖
+========================================================= */
 
 function drawGame() {
 
     drawBackground();
 
-    enemies.forEach(drawEnemy);
+    enemies.forEach(
+        drawEnemy
+    );
 
     drawPlayerBullets();
 
@@ -1914,18 +2603,28 @@ function drawGame() {
 function gameLoop(currentTime) {
 
     if (!gameRunning) {
+
         return;
+
     }
 
+
     let delta =
-        (currentTime - lastTime) / 1000;
+        (
+            currentTime -
+            lastTime
+        ) / 1000;
 
-    lastTime = currentTime;
 
-    /* 避免瀏覽器切換分頁後時間跳太大 */
+    lastTime =
+        currentTime;
+
 
     delta =
-        Math.min(delta, 0.033);
+        Math.min(
+            delta,
+            0.033
+        );
 
 
     updatePlayer(delta);
@@ -1938,29 +2637,461 @@ function gameLoop(currentTime) {
 
     handleCollisions();
 
+
     if (!gameRunning) {
+
         drawGame();
+
         return;
+
     }
+
 
     checkWave();
 
     drawGame();
 
+
     animationId =
-        requestAnimationFrame(gameLoop);
+        requestAnimationFrame(
+            gameLoop
+        );
 
 }
 
 
-/* ---------------------------------------------------------
-   按鈕
---------------------------------------------------------- */
+/* =========================================================
+   上傳分數到 Google Apps Script
+========================================================= */
+
+async function submitScore() {
+
+    let name =
+        nameInput.value.trim();
+
+
+    if (!name) {
+
+        uploadStatus.textContent =
+            "請先輸入暱稱！";
+
+        nameInput.focus();
+
+        return;
+
+    }
+
+
+    /*
+       限制暱稱 20 個字
+    */
+
+    if (name.length > 20) {
+
+        name =
+            name.substring(
+                0,
+                20
+            );
+
+    }
+
+
+    submitScoreButton.disabled =
+        true;
+
+    submitScoreButton.textContent =
+        "上傳中...";
+
+
+    uploadStatus.textContent =
+        "正在連線到銀河排行榜...";
+
+
+    try {
+
+        const response =
+            await fetch(
+                LEADERBOARD_API,
+                {
+
+                    method:
+                        "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "text/plain;charset=utf-8"
+
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            name:
+                                name,
+
+                            score:
+                                score
+
+                        })
+
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if (
+            result.success
+        ) {
+
+            uploadStatus.textContent =
+                "✓ 分數已成功上傳！";
+
+
+            submitScoreButton.textContent =
+                "已上傳";
+
+
+            /*
+               上傳成功後重新讀取排行榜
+            */
+
+            loadLeaderboard();
+
+        } else {
+
+            throw new Error(
+                result.error ||
+                "上傳失敗"
+            );
+
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "排行榜錯誤：",
+            error
+        );
+
+
+        uploadStatus.textContent =
+            "✕ 上傳失敗，請檢查網路連線";
+
+
+        submitScoreButton.disabled =
+            false;
+
+        submitScoreButton.textContent =
+            "重新上傳";
+
+    }
+
+}
+
+
+/* =========================================================
+   讀取雲端排行榜
+========================================================= */
+
+async function loadLeaderboard() {
+
+    leaderboardLoading.style.display =
+        "block";
+
+    leaderboardError.style.display =
+        "none";
+
+    leaderboardList.innerHTML =
+        "";
+
+
+    try {
+
+        const response =
+            await fetch(
+                LEADERBOARD_API +
+                "?t=" +
+                Date.now()
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "HTTP " +
+                response.status
+            );
+
+        }
+
+
+        const result =
+            await response.json();
+
+
+        if (
+            !result.success
+        ) {
+
+            throw new Error(
+                result.error ||
+                "排行榜讀取失敗"
+            );
+
+        }
+
+
+        leaderboardLoading.style.display =
+            "none";
+
+
+        renderLeaderboard(
+            result.leaderboard || []
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "排行榜讀取錯誤：",
+            error
+        );
+
+
+        leaderboardLoading.style.display =
+            "none";
+
+        leaderboardError.style.display =
+            "block";
+
+    }
+
+}
+
+
+/* =========================================================
+   顯示排行榜
+========================================================= */
+
+function renderLeaderboard(data) {
+
+    leaderboardList.innerHTML =
+        "";
+
+
+    if (
+        !data ||
+        data.length === 0
+    ) {
+
+        leaderboardList.innerHTML =
+            `
+            <div style="
+                text-align:center;
+                padding:20px;
+                color:#bca7d8;
+            ">
+                目前還沒有排行榜資料
+            </div>
+            `;
+
+        return;
+
+    }
+
+
+    data.forEach(
+        function(item, index) {
+
+            const row =
+                document.createElement(
+                    "div"
+                );
+
+
+            row.className =
+                "rankRow";
+
+
+            if (
+                index < 3
+            ) {
+
+                row.classList.add(
+                    "rankTop"
+                );
+
+            }
+
+
+            const number =
+                document.createElement(
+                    "div"
+                );
+
+
+            number.className =
+                "rankNumber";
+
+
+            const name =
+                document.createElement(
+                    "div"
+                );
+
+
+            name.className =
+                "rankName";
+
+
+            const score =
+                document.createElement(
+                    "div"
+                );
+
+
+            score.className =
+                "rankScore";
+
+
+            number.textContent =
+                "#" +
+                (index + 1);
+
+
+            name.textContent =
+                item.name;
+
+
+            score.textContent =
+                Number(
+                    item.score
+                ).toLocaleString();
+
+
+            row.appendChild(
+                number
+            );
+
+            row.appendChild(
+                name
+            );
+
+            row.appendChild(
+                score
+            );
+
+
+            leaderboardList.appendChild(
+                row
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   顯示排行榜
+========================================================= */
+
+function showLeaderboard() {
+
+    startOverlay.classList.add(
+        "hidden"
+    );
+
+    gameOverOverlay.classList.add(
+        "hidden"
+    );
+
+    leaderboardOverlay.classList.remove(
+        "hidden"
+    );
+
+
+    loadLeaderboard();
+
+}
+
+
+/* =========================================================
+   關閉排行榜
+========================================================= */
+
+function closeLeaderboard() {
+
+    leaderboardOverlay.classList.add(
+        "hidden"
+    );
+
+
+    /*
+       如果遊戲正在進行，
+       回到遊戲畫面。
+
+       如果沒有遊戲，
+       回到開始畫面。
+    */
+
+    if (gameRunning) {
+
+        startOverlay.classList.add(
+            "hidden"
+        );
+
+        gameOverOverlay.classList.add(
+            "hidden"
+        );
+
+    } else {
+
+        /*
+           如果遊戲結束畫面目前存在，
+           就回到遊戲結束畫面。
+
+           否則回開始畫面。
+        */
+
+        if (
+            !gameOverOverlay.classList.contains(
+                "hidden"
+            )
+        ) {
+
+            gameOverOverlay.classList.remove(
+                "hidden"
+            );
+
+        } else {
+
+            startOverlay.classList.remove(
+                "hidden"
+            );
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   按鈕事件
+========================================================= */
 
 startButton.addEventListener(
     "click",
     startGame
 );
+
 
 restartButton.addEventListener(
     "click",
@@ -1968,9 +3099,55 @@ restartButton.addEventListener(
 );
 
 
-/* ---------------------------------------------------------
+showLeaderboardButton.addEventListener(
+    "click",
+    showLeaderboard
+);
+
+
+gameOverLeaderboardButton.addEventListener(
+    "click",
+    showLeaderboard
+);
+
+
+closeLeaderboardButton.addEventListener(
+    "click",
+    closeLeaderboard
+);
+
+
+submitScoreButton.addEventListener(
+    "click",
+    submitScore
+);
+
+
+/*
+   按 Enter 也可以上傳
+*/
+
+nameInput.addEventListener(
+    "keydown",
+    function(event) {
+
+        if (
+            event.key === "Enter"
+        ) {
+
+            event.preventDefault();
+
+            submitScore();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
    初始設定
---------------------------------------------------------- */
+========================================================= */
 
 resizeCanvas();
 
@@ -1984,3 +3161,4 @@ drawGame();
 
 </body>
 </html>
+```
