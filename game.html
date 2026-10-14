@@ -1,436 +1,131 @@
+
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
 <title>銀河入侵者</title>
 
 <style>
-    * {
-        box-sizing: border-box;
-        -webkit-tap-highlight-color: transparent;
-    }
-
-    html,
-    body {
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        background: #080018;
-        color: #fff;
-        font-family: "Courier New", monospace;
-    }
-
-    body {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background:
-            radial-gradient(circle at 50% 20%, rgba(255, 0, 200, 0.15), transparent 35%),
-            linear-gradient(#09001c, #16002f 55%, #05000d);
-    }
-
-    body::before {
-        content: "";
-        position: fixed;
-        inset: 0;
-        pointer-events: none;
-        opacity: 0.45;
-        background-image:
-            radial-gradient(circle, #fff 1px, transparent 1px),
-            radial-gradient(circle, #ff4de1 1px, transparent 1px),
-            radial-gradient(circle, #00ffff 1px, transparent 1px);
-        background-size: 73px 73px, 121px 121px, 181px 181px;
-        background-position: 10px 20px, 40px 80px, 90px 30px;
-        animation: starMove 20s linear infinite;
-    }
-
-    @keyframes starMove {
-        from { transform: translateY(0); }
-        to { transform: translateY(100px); }
-    }
-
-    #gameWrapper {
-        width: min(96vw, 1000px);
-        height: min(94vh, 850px);
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-    }
-
-    #homeLink {
-        position: absolute;
-        left: 0;
-        top: 0;
-        z-index: 20;
-        color: #00ffff;
-        text-decoration: none;
-        font-size: 16px;
-        font-weight: bold;
-        text-shadow: 0 0 5px #00ffff, 0 0 12px #00ffff;
-        padding: 8px 12px;
-        border: 2px solid #00ffff;
-        background: rgba(0, 0, 30, 0.75);
-        transition: 0.2s;
-    }
-
-    #homeLink:hover {
-        color: #ff3cf7;
-        border-color: #ff3cf7;
-        text-shadow: 0 0 5px #ff3cf7, 0 0 12px #ff3cf7;
-        transform: translateY(-2px);
-    }
-
-    #title {
-        margin-top: 38px;
-        margin-bottom: 8px;
-        font-size: clamp(24px, 5vw, 48px);
-        letter-spacing: 5px;
-        color: #ff44e8;
-        text-align: center;
-        text-shadow: 3px 3px 0 #490078, 0 0 8px #ff00d9, 0 0 18px #ff00d9, 0 0 35px #ff00d9;
-        animation: neonPulse 2s ease-in-out infinite alternate;
-    }
-
-    @keyframes neonPulse {
-        from { filter: brightness(0.9); }
-        to { filter: brightness(1.3); }
-    }
-
-    #subtitle {
-        color: #00ffff;
-        font-size: 12px;
-        letter-spacing: 3px;
-        margin-bottom: 8px;
-        text-shadow: 0 0 6px #00ffff, 0 0 12px #00ffff;
-    }
-
-    #hud {
-        width: min(92vw, 850px);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 7px 15px;
-        margin-bottom: 7px;
-        border: 2px solid #ff38dc;
-        background: rgba(20, 0, 40, 0.8);
-        box-shadow: 0 0 8px #ff00d4, inset 0 0 10px rgba(255, 0, 212, 0.2);
-        font-size: clamp(12px, 2vw, 17px);
-    }
-
-    .hudItem {
-        color: #fff;
-        text-shadow: 0 0 6px #fff;
-    }
-
-    .hudValue {
-        color: #00ffff;
-        font-weight: bold;
-        text-shadow: 0 0 5px #00ffff, 0 0 12px #00ffff;
-    }
-
-    #livesValue {
-        color: #ff4fda;
-        text-shadow: 0 0 5px #ff4fda, 0 0 12px #ff4fda;
-    }
-
-    #canvasContainer {
-        position: relative;
-        width: min(92vw, 850px);
-        aspect-ratio: 4 / 3;
-        border: 4px solid #00ffff;
-        background: #020008;
-        box-shadow: 0 0 8px #00ffff, 0 0 25px rgba(0, 255, 255, 0.7), inset 0 0 30px rgba(0, 255, 255, 0.08);
-        overflow: hidden;
-    }
-
-    canvas {
-        display: block;
-        width: 100%;
-        height: 100%;
-        image-rendering: pixelated;
-        image-rendering: crisp-edges;
-        background: linear-gradient(rgba(0, 255, 255, 0.025) 50%, rgba(255, 0, 255, 0.025) 50%);
-        background-size: 100% 4px;
-    }
-
-    #canvasContainer::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        pointer-events: none;
-        background: repeating-linear-gradient(to bottom, transparent 0, transparent 3px, rgba(0, 255, 255, 0.035) 4px);
-    }
-
-    .overlay {
-        position: absolute;
-        inset: 0;
-        z-index: 10;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        background: radial-gradient(circle, rgba(30, 0, 60, 0.7), rgba(0, 0, 10, 0.94));
-        text-align: center;
-    }
-
-    .overlay.hidden { display: none; }
-
-    .overlayTitle {
-        font-size: clamp(26px, 6vw, 55px);
-        color: #ff42e6;
-        text-shadow: 3px 3px 0 #480066, 0 0 8px #ff00e6, 0 0 25px #ff00e6;
-        margin-bottom: 15px;
-    }
-
-    .overlayText {
-        color: #00ffff;
-        font-size: clamp(13px, 2.5vw, 18px);
-        line-height: 1.8;
-        text-shadow: 0 0 8px #00ffff;
-        margin-bottom: 25px;
-    }
-
-    .pixelButton {
-        border: 3px solid #00ffff;
-        background: #10002d;
-        color: #00ffff;
-        font-family: "Courier New", monospace;
-        font-weight: bold;
-        font-size: 18px;
-        padding: 12px 28px;
-        cursor: pointer;
-        box-shadow: 5px 5px 0 #ff00c8, 0 0 12px #00ffff;
-        text-shadow: 0 0 6px #00ffff;
-        transition: 0.15s;
-    }
-
-    .pixelButton:hover {
-        background: #260052;
-        color: #fff;
-        transform: translate(2px, 2px);
-        box-shadow: 3px 3px 0 #ff00c8, 0 0 20px #00ffff;
-    }
-
-    .pixelButton:active {
-        transform: translate(5px, 5px);
-        box-shadow: 0 0 10px #00ffff;
-    }
-
-    #nameInputArea {
-        width: min(80%, 400px);
-        margin-bottom: 18px;
-    }
-
-    #playerNameInput {
-        width: 100%;
-        padding: 12px 14px;
-        border: 2px solid #00ffff;
-        background: rgba(0, 0, 30, 0.9);
-        color: #ffffff;
-        font-family: "Courier New", monospace;
-        font-size: 17px;
-        text-align: center;
-        outline: none;
-        box-shadow: 0 0 8px #00ffff, inset 0 0 10px rgba(0, 255, 255, 0.1);
-        text-shadow: 0 0 5px #ffffff;
-    }
-
-    #playerNameInput:focus {
-        border-color: #ff3cf7;
-        box-shadow: 0 0 10px #ff3cf7, inset 0 0 12px rgba(255, 0, 200, 0.15);
-    }
-
-    #playerNameInput::placeholder { color: #8d78a8; }
-    #submitScoreButton { margin-top: 3px; }
-
-    #submitStatus {
-        min-height: 22px;
-        margin-top: 12px;
-        color: #00ffff;
-        font-size: 12px;
-        text-shadow: 0 0 6px #00ffff;
-    }
-
-    #leaderboardPanel {
-        width: min(88%, 520px);
-        margin-top: 10px;
-        border: 2px solid #ff38dc;
-        background: rgba(8, 0, 25, 0.92);
-        box-shadow: 0 0 10px rgba(255, 0, 220, 0.7), inset 0 0 15px rgba(255, 0, 220, 0.08);
-        padding: 10px 12px;
-        max-height: 310px;
-        overflow-y: auto;
-    }
-
-    #leaderboardTitle {
-        color: #ff45dc;
-        font-size: 18px;
-        font-weight: bold;
-        text-align: center;
-        margin-bottom: 8px;
-        text-shadow: 0 0 6px #ff00d9, 0 0 12px #ff00d9;
-    }
-
-    #leaderboardList { width: 100%; }
-
-    .rankRow {
-        display: grid;
-        grid-template-columns: 45px 1fr 100px;
-        gap: 8px;
-        padding: 5px 4px;
-        border-bottom: 1px solid rgba(0, 255, 255, 0.15);
-        font-size: 13px;
-    }
-
-    .rankRow:last-child { border-bottom: none; }
-    .rankNumber { color: #ff45dc; font-weight: bold; text-align: center; }
-    .rankName { color: #ffffff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .rankScore { color: #00ffff; font-weight: bold; text-align: right; text-shadow: 0 0 6px #00ffff; }
-    .rankTop { color: #ffe600; }
-    #leaderboardLoading { color: #00ffff; text-align: center; font-size: 12px; padding: 8px; }
-    #leaderboardError { color: #ff6bdf; text-align: center; font-size: 11px; padding: 8px; }
-
-    #refreshLeaderboardButton {
-        display: block;
-        margin: 8px auto 0;
-        padding: 5px 10px;
-        border: 1px solid #00ffff;
-        background: rgba(0, 20, 35, 0.8);
-        color: #00ffff;
-        font-family: "Courier New", monospace;
-        cursor: pointer;
-        font-size: 11px;
-    }
-
-    #refreshLeaderboardButton:hover { background: rgba(0, 255, 255, 0.15); }
-
-    #mobileControls {
-        display: none;
-        width: min(92vw, 850px);
-        margin-top: 10px;
-        grid-template-columns: 1fr 1fr 1fr;
-        gap: 10px;
-    }
-
-    .controlButton {
-        height: 58px;
-        border: 3px solid #00ffff;
-        background: rgba(10, 0, 35, 0.9);
-        color: #00ffff;
-        font-family: "Courier New", monospace;
-        font-size: 25px;
-        font-weight: bold;
-        box-shadow: 0 0 8px #00ffff, inset 0 0 10px rgba(0, 255, 255, 0.1);
-        user-select: none;
-        touch-action: none;
-    }
-
-    .controlButton.shoot {
-        color: #ff45dc;
-        border-color: #ff45dc;
-        box-shadow: 0 0 8px #ff45dc, inset 0 0 10px rgba(255, 0, 200, 0.1);
-    }
-
-    .controlButton:active {
-        background: rgba(0, 255, 255, 0.2);
-        transform: scale(0.95);
-    }
-
-    #hint {
-        margin-top: 7px;
-        color: #bca7d8;
-        font-size: 11px;
-        text-align: center;
-    }
-
-    @media (max-width: 700px) {
-        #gameWrapper { width: 100vw; height: 100vh; padding-top: 3px; }
-        #homeLink { left: 8px; top: 5px; font-size: 12px; padding: 6px 8px; }
-        #title { margin-top: 38px; margin-bottom: 3px; font-size: 25px; letter-spacing: 2px; }
-        #subtitle { font-size: 9px; margin-bottom: 5px; }
-        #hud { width: 94vw; margin-bottom: 5px; padding: 5px 8px; font-size: 11px; }
-        #canvasContainer { width: 94vw; aspect-ratio: 3 / 4; max-height: 65vh; }
-        #mobileControls { display: grid; }
-        #hint { display: none; }
-        #leaderboardPanel { width: 90%; max-height: 250px; }
-        .rankRow { grid-template-columns: 35px 1fr 80px; font-size: 11px; }
-    }
-
-    @media (max-height: 650px) {
-        #title { font-size: 21px; margin-top: 35px; }
-        #subtitle { display: none; }
-        #canvasContainer { max-height: 57vh; }
-        .controlButton { height: 48px; }
-    }
-
-    @media (pointer: coarse) {
-        #mobileControls { display: grid; }
-        #hint { display: none; }
-    }
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#080018;color:#fff;font-family:"Courier New",monospace}
+body{display:flex;justify-content:center;align-items:center;background:radial-gradient(circle at 50% 20%,rgba(255,0,200,.15),transparent 35%),linear-gradient(#09001c,#16002f 55%,#05000d)}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.45;background-image:radial-gradient(circle,#fff 1px,transparent 1px),radial-gradient(circle,#ff4de1 1px,transparent 1px),radial-gradient(circle,#00ffff 1px,transparent 1px);background-size:73px 73px,121px 121px,181px 181px;background-position:10px 20px,40px 80px,90px 30px;animation:starMove 20s linear infinite}
+@keyframes starMove{from{transform:translateY(0)}to{transform:translateY(100px)}}
+#gameWrapper{width:min(96vw,1000px);height:min(94vh,850px);position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center}
+#homeLink{position:absolute;left:0;top:0;z-index:20;color:#00ffff;text-decoration:none;font-size:16px;font-weight:bold;text-shadow:0 0 5px #00ffff,0 0 12px #00ffff;padding:8px 12px;border:2px solid #00ffff;background:rgba(0,0,30,.75);transition:.2s}
+#homeLink:hover{color:#ff3cf7;border-color:#ff3cf7;text-shadow:0 0 5px #ff3cf7,0 0 12px #ff3cf7;transform:translateY(-2px)}
+#title{margin-top:38px;margin-bottom:8px;font-size:clamp(24px,5vw,48px);letter-spacing:5px;color:#ff44e8;text-align:center;text-shadow:3px 3px 0 #490078,0 0 8px #ff00d9,0 0 18px #ff00d9,0 0 35px #ff00d9;animation:neonPulse 2s ease-in-out infinite alternate}
+@keyframes neonPulse{from{filter:brightness(.9)}to{filter:brightness(1.3)}}
+#subtitle{color:#00ffff;font-size:12px;letter-spacing:3px;margin-bottom:8px;text-shadow:0 0 6px #00ffff,0 0 12px #00ffff}
+#hud{width:min(92vw,850px);display:flex;justify-content:space-between;align-items:center;padding:7px 15px;margin-bottom:7px;border:2px solid #ff38dc;background:rgba(20,0,40,.8);box-shadow:0 0 8px #ff00d4,inset 0 0 10px rgba(255,0,212,.2);font-size:clamp(12px,2vw,17px)}
+.hudItem{color:#fff;text-shadow:0 0 6px #fff}
+.hudValue{color:#00ffff;font-weight:bold;text-shadow:0 0 5px #00ffff,0 0 12px #00ffff}
+#livesValue{color:#ff4fda;text-shadow:0 0 5px #ff4fda,0 0 12px #ff4fda}
+#canvasContainer{position:relative;width:min(92vw,850px);aspect-ratio:4/3;border:4px solid #00ffff;background:#020008;box-shadow:0 0 8px #00ffff,0 0 25px rgba(0,255,255,.7),inset 0 0 30px rgba(0,255,255,.08);overflow:hidden}
+canvas{display:block;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;background:linear-gradient(rgba(0,255,255,.025) 50%,rgba(255,0,255,.025) 50%);background-size:100% 4px}
+#canvasContainer::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(to bottom,transparent 0,transparent 3px,rgba(0,255,255,.035) 4px)}
+.overlay{position:absolute;inset:0;z-index:10;display:flex;justify-content:center;align-items:center;flex-direction:column;background:radial-gradient(circle,rgba(30,0,60,.7),rgba(0,0,10,.94));text-align:center}
+.overlay.hidden{display:none}
+.overlayTitle{font-size:clamp(26px,6vw,55px);color:#ff42e6;text-shadow:3px 3px 0 #480066,0 0 8px #ff00e6,0 0 25px #ff00e6;margin-bottom:15px}
+.overlayText{color:#00ffff;font-size:clamp(13px,2.5vw,18px);line-height:1.8;text-shadow:0 0 8px #00ffff;margin-bottom:25px}
+.pixelButton{border:3px solid #00ffff;background:#10002d;color:#00ffff;font-family:"Courier New",monospace;font-weight:bold;font-size:18px;padding:12px 28px;cursor:pointer;box-shadow:5px 5px 0 #ff00c8,0 0 12px #00ffff;text-shadow:0 0 6px #00ffff;transition:.15s}
+.pixelButton:hover{background:#260052;color:#fff;transform:translate(2px,2px);box-shadow:3px 3px 0 #ff00c8,0 0 20px #00ffff}
+.pixelButton:active{transform:translate(5px,5px);box-shadow:0 0 10px #00ffff}
+#nameInputArea{width:min(80%,400px);margin-bottom:18px}
+#playerNameInput{width:100%;padding:12px 14px;border:2px solid #00ffff;background:rgba(0,0,30,.9);color:#fff;font-family:"Courier New",monospace;font-size:17px;text-align:center;outline:none;box-shadow:0 0 8px #00ffff,inset 0 0 10px rgba(0,255,255,.1);text-shadow:0 0 5px #fff}
+#playerNameInput:focus{border-color:#ff3cf7;box-shadow:0 0 10px #ff3cf7,inset 0 0 12px rgba(255,0,200,.15)}
+#playerNameInput::placeholder{color:#8d78a8}
+#submitScoreButton{margin-top:3px}
+#submitStatus{min-height:22px;margin-top:12px;color:#00ffff;font-size:12px;text-shadow:0 0 6px #00ffff}
+#leaderboardPanel{width:min(88%,520px);margin-top:10px;border:2px solid #ff38dc;background:rgba(8,0,25,.92);box-shadow:0 0 10px rgba(255,0,220,.7),inset 0 0 15px rgba(255,0,220,.08);padding:10px 12px;max-height:310px;overflow-y:auto}
+#leaderboardTitle{color:#ff45dc;font-size:18px;font-weight:bold;text-align:center;margin-bottom:8px;text-shadow:0 0 6px #ff00d9,0 0 12px #ff00d9}
+#leaderboardList{width:100%}
+.rankRow{display:grid;grid-template-columns:45px 1fr 100px;gap:8px;padding:5px 4px;border-bottom:1px solid rgba(0,255,255,.15);font-size:13px}
+.rankRow:last-child{border-bottom:none}
+.rankNumber{color:#ff45dc;font-weight:bold;text-align:center}
+.rankName{color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rankScore{color:#00ffff;font-weight:bold;text-align:right;text-shadow:0 0 6px #00ffff}
+.rankTop{color:#ffe600}
+#leaderboardLoading{color:#00ffff;text-align:center;font-size:12px;padding:8px}
+#leaderboardError{color:#ff6bdf;text-align:center;font-size:11px;padding:8px}
+#refreshLeaderboardButton{display:block;margin:8px auto 0;padding:5px 10px;border:1px solid #00ffff;background:rgba(0,20,35,.8);color:#00ffff;font-family:"Courier New",monospace;cursor:pointer;font-size:11px}
+#refreshLeaderboardButton:hover{background:rgba(0,255,255,.15)}
+#mobileControls{display:none;width:min(92vw,850px);margin-top:10px;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.controlButton{height:58px;border:3px solid #00ffff;background:rgba(10,0,35,.9);color:#00ffff;font-family:"Courier New",monospace;font-size:25px;font-weight:bold;box-shadow:0 0 8px #00ffff,inset 0 0 10px rgba(0,255,255,.1);user-select:none;touch-action:none}
+.controlButton.shoot{color:#ff45dc;border-color:#ff45dc;box-shadow:0 0 8px #ff45dc,inset 0 0 10px rgba(255,0,200,.1)}
+.controlButton:active{background:rgba(0,255,255,.2);transform:scale(.95)}
+#hint{margin-top:7px;color:#bca7d8;font-size:11px;text-align:center}
+@media(max-width:700px){
+#gameWrapper{width:100vw;height:100vh;padding-top:3px}
+#homeLink{left:8px;top:5px;font-size:12px;padding:6px 8px}
+#title{margin-top:38px;margin-bottom:3px;font-size:25px;letter-spacing:2px}
+#subtitle{font-size:9px;margin-bottom:5px}
+#hud{width:94vw;margin-bottom:5px;padding:5px 8px;font-size:11px}
+#canvasContainer{width:94vw;aspect-ratio:3/4;max-height:65vh}
+#mobileControls{display:grid}
+#hint{display:none}
+#leaderboardPanel{width:90%;max-height:250px}
+.rankRow{grid-template-columns:35px 1fr 80px;font-size:11px}
+}
+@media(max-height:650px){
+#title{font-size:21px;margin-top:35px}
+#subtitle{display:none}
+#canvasContainer{max-height:57vh}
+.controlButton{height:48px}
+}
+@media(pointer:coarse){#mobileControls{display:grid}#hint{display:none}}
 </style>
 </head>
-
 <body>
 
 <div id="gameWrapper">
-    <a id="homeLink" href="index.html">← 回首頁</a>
-    <div id="title">銀河入侵者</div>
-    <div id="subtitle">SPACE INVADERS // SYNTHWAVE EDITION</div>
+<a id="homeLink" href="index.html">← 回首頁</a>
+<div id="title">銀河入侵者</div>
+<div id="subtitle">SPACE INVADERS // SYNTHWAVE EDITION</div>
 
-    <div id="hud">
-        <div class="hudItem">分數：<span id="scoreValue" class="hudValue">0</span></div>
-        <div class="hudItem">波次：<span id="waveValue" class="hudValue">1</span></div>
-        <div class="hudItem">最高分：<span id="highScoreValue" class="hudValue">0</span></div>
-        <div class="hudItem">生命：<span id="livesValue">♥ ♥ ♥</span></div>
-    </div>
+<div id="hud">
+<div class="hudItem">分數：<span id="scoreValue" class="hudValue">0</span></div>
+<div class="hudItem">波次：<span id="waveValue" class="hudValue">1</span></div>
+<div class="hudItem">最高分：<span id="highScoreValue" class="hudValue">0</span></div>
+<div class="hudItem">生命：<span id="livesValue">♥ ♥ ♥</span></div>
+</div>
 
-    <div id="canvasContainer">
-        <canvas id="gameCanvas"></canvas>
+<div id="canvasContainer">
+<canvas id="gameCanvas"></canvas>
 
-        <div id="startOverlay" class="overlay">
-            <div class="overlayTitle">銀河入侵者</div>
-            <div class="overlayText">外星艦隊正在入侵！<br>消滅所有敵人，守護銀河。</div>
-            <button id="startButton" class="pixelButton">開始遊戲</button>
-        </div>
+<div id="startOverlay" class="overlay">
+<div class="overlayTitle">銀河入侵者</div>
+<div class="overlayText">外星艦隊正在入侵！<br>消滅所有敵人，守護銀河。</div>
+<button id="startButton" class="pixelButton">開始遊戲</button>
+</div>
 
-        <div id="gameOverOverlay" class="overlay hidden">
-            <div class="overlayTitle">遊戲結束</div>
-            <div class="overlayText">
-                最終分數：<span id="finalScore">0</span><br>
-                最高分：<span id="finalHighScore">0</span>
-            </div>
+<div id="gameOverOverlay" class="overlay hidden">
+<div class="overlayTitle">遊戲結束</div>
+<div class="overlayText">
+最終分數：<span id="finalScore">0</span><br>
+最高分：<span id="finalHighScore">0</span>
+</div>
+<div id="nameInputArea">
+<input id="playerNameInput" type="text" maxlength="20" placeholder="輸入你的暱稱" autocomplete="off">
+</div>
+<button id="submitScoreButton" class="pixelButton">上傳分數</button>
+<div id="submitStatus"></div>
+<button id="restartButton" class="pixelButton" style="margin-top:10px">重新開始</button>
+<div id="leaderboardPanel">
+<div id="leaderboardTitle">★ 雲端排行榜 TOP 10 ★</div>
+<div id="leaderboardList"><div id="leaderboardLoading">正在讀取排行榜...</div></div>
+<button id="refreshLeaderboardButton">↻ 更新排行榜</button>
+</div>
+</div>
+</div>
 
-            <div id="nameInputArea">
-                <input id="playerNameInput" type="text" maxlength="20" placeholder="輸入你的暱稱" autocomplete="off">
-            </div>
-
-            <button id="submitScoreButton" class="pixelButton">上傳分數</button>
-            <div id="submitStatus"></div>
-            <button id="restartButton" class="pixelButton" style="margin-top: 10px;">重新開始</button>
-
-            <div id="leaderboardPanel">
-                <div id="leaderboardTitle">★ 雲端排行榜 TOP 10 ★</div>
-                <div id="leaderboardList">
-                    <div id="leaderboardLoading">正在讀取排行榜...</div>
-                </div>
-                <button id="refreshLeaderboardButton">↻ 更新排行榜</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="mobileControls">
-        <button id="leftButton" class="controlButton" aria-label="向左">◀</button>
-        <button id="shootButton" class="controlButton shoot" aria-label="射擊">●</button>
-        <button id="rightButton" class="controlButton" aria-label="向右">▶</button>
-    </div>
-
-    <div id="hint">電腦：← → 移動 ｜ 空白鍵射擊</div>
+<div id="mobileControls">
+<button id="leftButton" class="controlButton" aria-label="向左">◀</button>
+<button id="shootButton" class="controlButton shoot" aria-label="射擊">●</button>
+<button id="rightButton" class="controlButton" aria-label="向右">▶</button>
+</div>
+<div id="hint">電腦：← → 移動 ｜ 空白鍵射擊</div>
 </div>
 
 <script>
@@ -438,25 +133,19 @@ const API_URL = "https://script.google.com/macros/s/AKfycbya0dv0ePZyou2W8q1ymhw-
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
-
 const scoreValue = document.getElementById("scoreValue");
 const highScoreValue = document.getElementById("highScoreValue");
 const livesValue = document.getElementById("livesValue");
 const waveValue = document.getElementById("waveValue");
-
 const startOverlay = document.getElementById("startOverlay");
 const gameOverOverlay = document.getElementById("gameOverOverlay");
-
 const startButton = document.getElementById("startButton");
 const restartButton = document.getElementById("restartButton");
-
 const finalScore = document.getElementById("finalScore");
 const finalHighScore = document.getElementById("finalHighScore");
-
 const playerNameInput = document.getElementById("playerNameInput");
 const submitScoreButton = document.getElementById("submitScoreButton");
 const submitStatus = document.getElementById("submitStatus");
-
 const leaderboardList = document.getElementById("leaderboardList");
 const refreshLeaderboardButton = document.getElementById("refreshLeaderboardButton");
 
@@ -470,7 +159,6 @@ function resizeCanvas() {
     canvas.height = Math.floor(rect.height * dpr);
     ctx.setTransform(canvas.width / WIDTH, 0, 0, canvas.height / HEIGHT, 0, 0);
 }
-
 window.addEventListener("resize", resizeCanvas);
 
 let gameRunning = false;
@@ -482,14 +170,9 @@ let lastTime = 0;
 let animationId = null;
 
 const player = {
-    x: WIDTH / 2,
-    y: HEIGHT - 60,
-    width: 46,
-    height: 26,
-    speed: 430,
-    cooldown: 0,
-    shootDelay: 0.25,
-    invincible: 0
+    x: WIDTH / 2, y: HEIGHT - 60,
+    width: 46, height: 26, speed: 430,
+    cooldown: 0, shootDelay: 0.25, invincible: 0
 };
 
 let playerBullets = [];
@@ -504,14 +187,11 @@ let enemyShootTimer = 0;
 const keys = { left: false, right: false, shoot: false };
 
 document.addEventListener("keydown", function(event) {
-    if (["ArrowLeft", "ArrowRight", "Space"].includes(event.code)) {
-        event.preventDefault();
-    }
+    if (["ArrowLeft", "ArrowRight", "Space"].includes(event.code)) event.preventDefault();
     if (event.code === "ArrowLeft") keys.left = true;
     if (event.code === "ArrowRight") keys.right = true;
     if (event.code === "Space") keys.shoot = true;
 });
-
 document.addEventListener("keyup", function(event) {
     if (event.code === "ArrowLeft") keys.left = false;
     if (event.code === "ArrowRight") keys.right = false;
@@ -524,7 +204,6 @@ function setupTouchButton(element, keyName) {
     element.addEventListener("pointercancel", () => { keys[keyName] = false; });
     element.addEventListener("pointerleave", () => { keys[keyName] = false; });
 }
-
 setupTouchButton(document.getElementById("leftButton"), "left");
 setupTouchButton(document.getElementById("rightButton"), "right");
 setupTouchButton(document.getElementById("shootButton"), "shoot");
@@ -549,8 +228,7 @@ function createEnemies() {
                 y: startY + row * (enemyHeight + gapY),
                 width: enemyWidth,
                 height: enemyHeight,
-                type: type,
-                alive: true,
+                type, alive: true,
                 points: type === 0 ? 30 : type === 1 ? 20 : 10
             });
         }
@@ -561,15 +239,14 @@ function createEnemies() {
 }
 
 function resetGame() {
-    score = 0;
-    lives = 3;
-    wave = 1;
+    score = 0; lives = 3; wave = 1;
     player.x = WIDTH / 2;
     player.y = HEIGHT - 60;
     player.cooldown = 0;
     player.invincible = 0;
     playerBullets = [];
     enemyBullets = [];
+    enemyShootTimer = 0;
     createEnemies();
     updateHUD();
 }
@@ -614,15 +291,13 @@ function updateHUD() {
 function playerShoot() {
     if (player.cooldown > 0) return;
     playerBullets.push({
-        x: player.x,
-        y: player.y - player.height / 2,
-        width: 5,
-        height: 18,
-        speed: 650
+        x: player.x, y: player.y - player.height / 2,
+        width: 5, height: 18, speed: 650
     });
     player.cooldown = player.shootDelay;
 }
 
+/* 新增：依敵人種類發射不同彈幕 */
 function enemyShoot() {
     const aliveEnemies = enemies.filter(enemy => enemy.alive);
     if (aliveEnemies.length === 0) return;
@@ -637,14 +312,44 @@ function enemyShoot() {
 
     const shooters = Object.values(columns);
     const shooter = shooters[Math.floor(Math.random() * shooters.length)];
+    const startX = shooter.x;
+    const startY = shooter.y + shooter.height / 2;
+    const speed = 230 + wave * 10;
 
-    enemyBullets.push({
-        x: shooter.x,
-        y: shooter.y + shooter.height / 2,
-        width: 5,
-        height: 15,
-        speed: 230 + wave * 10
-    });
+    if (shooter.type === 0) {
+        // 粉紅敵人：快速直線光波
+        enemyBullets.push({
+            x: startX, y: startY,
+            width: 6, height: 27,
+            vx: 0, vy: speed * 1.65,
+            kind: "laser", color: "#ff38dc"
+        });
+    } else if (shooter.type === 1) {
+        // 紫色敵人：三方向散彈
+        [-0.32, 0, 0.32].forEach(angle => {
+            enemyBullets.push({
+                x: startX, y: startY,
+                width: 9, height: 12,
+                vx: Math.sin(angle) * speed,
+                vy: Math.cos(angle) * speed,
+                kind: "spread", color: "#b56bff"
+            });
+        });
+    } else {
+        // 青色敵人：瞄準玩家位置的追向彈
+        const dx = player.x - startX;
+        const dy = player.y - startY;
+        const length = Math.sqrt(dx * dx + dy * dy) || 1;
+        const aimedSpeed = speed * 1.05;
+
+        enemyBullets.push({
+            x: startX, y: startY,
+            width: 10, height: 10,
+            vx: dx / length * aimedSpeed,
+            vy: dy / length * aimedSpeed,
+            kind: "aimed", color: "#00ffff"
+        });
+    }
 }
 
 function isColliding(a, b) {
@@ -659,10 +364,8 @@ function isColliding(a, b) {
 function updatePlayer(delta) {
     if (keys.left) player.x -= player.speed * delta;
     if (keys.right) player.x += player.speed * delta;
-
     const halfWidth = player.width / 2;
     player.x = Math.max(halfWidth, Math.min(WIDTH - halfWidth, player.x));
-
     if (player.cooldown > 0) player.cooldown -= delta;
     if (player.invincible > 0) player.invincible -= delta;
     if (keys.shoot) playerShoot();
@@ -682,9 +385,7 @@ function updateEnemies(delta) {
 
         aliveEnemies.forEach(enemy => {
             const nextX = enemy.x + enemyDirection * 20;
-            if (nextX - enemy.width / 2 < 20 || nextX + enemy.width / 2 > WIDTH - 20) {
-                hitEdge = true;
-            }
+            if (nextX - enemy.width / 2 < 20 || nextX + enemy.width / 2 > WIDTH - 20) hitEdge = true;
         });
 
         if (hitEdge) {
@@ -703,9 +404,18 @@ function updateEnemies(delta) {
     }
 }
 
+/* 新增：同時支援垂直光波、散彈及瞄準彈 */
 function updateEnemyBullets(delta) {
-    enemyBullets.forEach(bullet => { bullet.y += bullet.speed * delta; });
-    enemyBullets = enemyBullets.filter(bullet => bullet.y < HEIGHT + 30);
+    enemyBullets.forEach(bullet => {
+        bullet.x += (bullet.vx || 0) * delta;
+        bullet.y += (bullet.vy === undefined ? bullet.speed : bullet.vy) * delta;
+    });
+    enemyBullets = enemyBullets.filter(bullet =>
+        bullet.y < HEIGHT + 40 &&
+        bullet.y > -40 &&
+        bullet.x > -40 &&
+        bullet.x < WIDTH + 40
+    );
 }
 
 function handleCollisions() {
@@ -782,111 +492,99 @@ function drawBackground() {
     ctx.globalAlpha = 1;
 
     const horizon = HEIGHT - 105;
-    ctx.strokeStyle = "rgba(255, 0, 220, 0.35)";
+    ctx.strokeStyle = "rgba(255,0,220,.35)";
     ctx.lineWidth = 2;
-
     for (let y = horizon; y < HEIGHT; y += 14) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(WIDTH, y);
-        ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(WIDTH, y); ctx.stroke();
     }
-
     for (let x = -WIDTH; x < WIDTH * 2; x += 70) {
         ctx.beginPath();
         ctx.moveTo(WIDTH / 2, horizon);
         ctx.lineTo(WIDTH / 2 + (x - WIDTH / 2) * 2, HEIGHT);
         ctx.stroke();
     }
-
-    ctx.strokeStyle = "rgba(0, 255, 255, 0.25)";
-    ctx.beginPath();
-    ctx.moveTo(0, horizon);
-    ctx.lineTo(WIDTH, horizon);
-    ctx.stroke();
+    ctx.strokeStyle = "rgba(0,255,255,.25)";
+    ctx.beginPath(); ctx.moveTo(0, horizon); ctx.lineTo(WIDTH, horizon); ctx.stroke();
 }
 
 function drawPlayer() {
     if (player.invincible > 0 && Math.floor(player.invincible * 12) % 2 === 0) return;
-    const x = player.x;
-    const y = player.y;
-
+    const x = player.x, y = player.y;
     ctx.save();
-    ctx.shadowColor = "#00ffff";
-    ctx.shadowBlur = 15;
-    ctx.fillStyle = "#00ffff";
-    ctx.fillRect(x - 23, y - 7, 46, 14);
-    ctx.fillStyle = "#ff45dc";
-    ctx.fillRect(x - 12, y - 15, 24, 8);
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(x - 6, y - 12, 12, 7);
-    ctx.fillStyle = "#00ffff";
-    ctx.fillRect(x - 28, y - 4, 7, 12);
-    ctx.fillRect(x + 21, y - 4, 7, 12);
-    ctx.fillStyle = "#ff00d9";
-    ctx.fillRect(x - 15, y + 7, 8, 8);
-    ctx.fillRect(x + 7, y + 7, 8, 8);
+    ctx.shadowColor = "#00ffff"; ctx.shadowBlur = 15;
+    ctx.fillStyle = "#00ffff"; ctx.fillRect(x - 23, y - 7, 46, 14);
+    ctx.fillStyle = "#ff45dc"; ctx.fillRect(x - 12, y - 15, 24, 8);
+    ctx.fillStyle = "#fff"; ctx.fillRect(x - 6, y - 12, 12, 7);
+    ctx.fillStyle = "#00ffff"; ctx.fillRect(x - 28, y - 4, 7, 12); ctx.fillRect(x + 21, y - 4, 7, 12);
+    ctx.fillStyle = "#ff00d9"; ctx.fillRect(x - 15, y + 7, 8, 8); ctx.fillRect(x + 7, y + 7, 8, 8);
     ctx.restore();
 }
 
 function drawEnemy(enemy) {
     if (!enemy.alive) return;
-    const x = enemy.x;
-    const y = enemy.y;
-
+    const x = enemy.x, y = enemy.y;
     ctx.save();
-    let mainColor = enemy.type === 0 ? "#ff39d9" : enemy.type === 1 ? "#8c52ff" : "#00ffff";
-    let glowColor = enemy.type === 0 ? "#ff00d9" : enemy.type === 1 ? "#7b00ff" : "#00ffff";
-
-    ctx.shadowColor = glowColor;
-    ctx.shadowBlur = 12;
-    ctx.fillStyle = mainColor;
+    const mainColor = enemy.type === 0 ? "#ff39d9" : enemy.type === 1 ? "#8c52ff" : "#00ffff";
+    const glowColor = enemy.type === 0 ? "#ff00d9" : enemy.type === 1 ? "#7b00ff" : "#00ffff";
+    ctx.shadowColor = glowColor; ctx.shadowBlur = 12; ctx.fillStyle = mainColor;
 
     if (enemy.type === 0) {
         ctx.fillRect(x - 17, y - 9, 34, 17);
-        ctx.fillRect(x - 22, y - 5, 5, 10);
-        ctx.fillRect(x + 17, y - 5, 5, 10);
-        ctx.fillRect(x - 12, y + 8, 6, 5);
-        ctx.fillRect(x + 6, y + 8, 6, 5);
+        ctx.fillRect(x - 22, y - 5, 5, 10); ctx.fillRect(x + 17, y - 5, 5, 10);
+        ctx.fillRect(x - 12, y + 8, 6, 5); ctx.fillRect(x + 6, y + 8, 6, 5);
     } else if (enemy.type === 1) {
-        ctx.fillRect(x - 19, y - 5, 38, 11);
-        ctx.fillRect(x - 12, y - 10, 24, 7);
-        ctx.fillRect(x - 7, y - 14, 14, 5);
-        ctx.fillRect(x - 22, y + 2, 5, 5);
-        ctx.fillRect(x + 17, y + 2, 5, 5);
+        ctx.fillRect(x - 19, y - 5, 38, 11); ctx.fillRect(x - 12, y - 10, 24, 7);
+        ctx.fillRect(x - 7, y - 14, 14, 5); ctx.fillRect(x - 22, y + 2, 5, 5); ctx.fillRect(x + 17, y + 2, 5, 5);
     } else {
-        ctx.fillRect(x - 16, y - 12, 32, 23);
-        ctx.fillRect(x - 22, y - 6, 6, 10);
-        ctx.fillRect(x + 16, y - 6, 6, 10);
-        ctx.fillRect(x - 10, y + 10, 6, 6);
-        ctx.fillRect(x + 4, y + 10, 6, 6);
+        ctx.fillRect(x - 16, y - 12, 32, 23); ctx.fillRect(x - 22, y - 6, 6, 10);
+        ctx.fillRect(x + 16, y - 6, 6, 10); ctx.fillRect(x - 10, y + 10, 6, 6); ctx.fillRect(x + 4, y + 10, 6, 6);
     }
-
-    ctx.shadowBlur = 0;
-    ctx.fillStyle = "#05000b";
-    ctx.fillRect(x - 9, y - 3, 5, 6);
-    ctx.fillRect(x + 4, y - 3, 5, 6);
+    ctx.shadowBlur = 0; ctx.fillStyle = "#05000b";
+    ctx.fillRect(x - 9, y - 3, 5, 6); ctx.fillRect(x + 4, y - 3, 5, 6);
     ctx.restore();
 }
 
 function drawPlayerBullets() {
-    ctx.save();
-    ctx.shadowColor = "#00ffff";
-    ctx.shadowBlur = 15;
-    ctx.fillStyle = "#00ffff";
-    playerBullets.forEach(bullet => {
-        ctx.fillRect(bullet.x - bullet.width / 2, bullet.y - bullet.height / 2, bullet.width, bullet.height);
-    });
+    ctx.save(); ctx.shadowColor = "#00ffff"; ctx.shadowBlur = 15; ctx.fillStyle = "#00ffff";
+    playerBullets.forEach(bullet => ctx.fillRect(bullet.x - bullet.width / 2, bullet.y - bullet.height / 2, bullet.width, bullet.height));
     ctx.restore();
 }
 
+/* 新增：不同彈幕各自使用不同外觀 */
 function drawEnemyBullets() {
     ctx.save();
-    ctx.shadowColor = "#ff00dd";
-    ctx.shadowBlur = 12;
-    ctx.fillStyle = "#ff44dd";
     enemyBullets.forEach(bullet => {
-        ctx.fillRect(bullet.x - bullet.width / 2, bullet.y - bullet.height / 2, bullet.width, bullet.height);
+        const color = bullet.color || "#ff44dd";
+        ctx.shadowColor = color;
+        ctx.shadowBlur = bullet.kind === "laser" ? 20 : 12;
+        ctx.fillStyle = color;
+
+        if (bullet.kind === "laser") {
+            // 光波：明亮的長形光束
+            ctx.fillRect(bullet.x - bullet.width / 2, bullet.y - bullet.height / 2, bullet.width, bullet.height);
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(bullet.x - 1, bullet.y - bullet.height / 2, 2, bullet.height);
+        } else if (bullet.kind === "spread") {
+            // 散彈：菱形子彈
+            ctx.beginPath();
+            ctx.moveTo(bullet.x, bullet.y - bullet.height / 2);
+            ctx.lineTo(bullet.x + bullet.width / 2, bullet.y);
+            ctx.lineTo(bullet.x, bullet.y + bullet.height / 2);
+            ctx.lineTo(bullet.x - bullet.width / 2, bullet.y);
+            ctx.closePath();
+            ctx.fill();
+        } else if (bullet.kind === "aimed") {
+            // 瞄準彈：發光圓形
+            ctx.beginPath();
+            ctx.arc(bullet.x, bullet.y, bullet.width / 2, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = "#ffffff";
+            ctx.beginPath();
+            ctx.arc(bullet.x, bullet.y, 2, 0, Math.PI * 2);
+            ctx.fill();
+        } else {
+            ctx.fillRect(bullet.x - bullet.width / 2, bullet.y - bullet.height / 2, bullet.width, bullet.height);
+        }
     });
     ctx.restore();
 }
@@ -912,93 +610,58 @@ function gameLoop(currentTime) {
     handleCollisions();
 
     if (!gameRunning) { drawGame(); return; }
-
     checkWave();
     drawGame();
     animationId = requestAnimationFrame(gameLoop);
 }
 
-/* =========================================================
-   雲端排行榜 API 互動邏輯 (增加 redirect: follow 轉址相容)
-========================================================= */
-
+/* 雲端排行榜 API：保留原本功能 */
 async function loadLeaderboard() {
     leaderboardList.innerHTML = '<div id="leaderboardLoading">正在讀取排行榜...</div>';
-
     try {
-        const response = await fetch(API_URL + "?action=leaderboard", {
-            method: "GET",
-            redirect: "follow"
-        });
-
-        if (!response.ok) {
-            throw new Error("伺服器回應錯誤：" + response.status);
-        }
-
+        const response = await fetch(API_URL + "?action=leaderboard", { method: "GET", redirect: "follow" });
+        if (!response.ok) throw new Error("伺服器回應錯誤：" + response.status);
         const data = await response.json();
-
-        if (!data.success) {
-            throw new Error(data.error || "排行榜讀取失敗");
-        }
-
+        if (!data.success) throw new Error(data.error || "排行榜讀取失敗");
         renderLeaderboard(data.leaderboard || []);
-
     } catch (error) {
         console.error("排行榜讀取失敗：", error);
-        leaderboardList.innerHTML =
-            '<div id="leaderboardError">' +
-            '目前無法讀取雲端排行榜<br>' +
-            '請確認 Apps Script 已部署並將權限設為「所有人」。' +
-            '</div>';
+        leaderboardList.innerHTML = '<div id="leaderboardError">目前無法讀取雲端排行榜<br>請確認 Apps Script 已部署並將權限設為「所有人」。</div>';
     }
 }
 
 function renderLeaderboard(leaderboard) {
     leaderboardList.innerHTML = "";
-
     if (!leaderboard || leaderboard.length === 0) {
-        leaderboardList.innerHTML =
-            '<div id="leaderboardLoading">' +
-            '目前還沒有玩家紀錄<br>' +
-            '成為第一個登上排行榜的人吧！' +
-            '</div>';
+        leaderboardList.innerHTML = '<div id="leaderboardLoading">目前還沒有玩家紀錄<br>成為第一個登上排行榜的人吧！</div>';
         return;
     }
-
     leaderboard.forEach((item, index) => {
         const row = document.createElement("div");
         row.className = "rankRow";
-
         const rank = document.createElement("div");
         rank.className = "rankNumber";
         if (index < 3) rank.classList.add("rankTop");
         rank.textContent = "#" + (index + 1);
-
         const name = document.createElement("div");
         name.className = "rankName";
         name.textContent = item.name || "匿名玩家";
-
-        const score = document.createElement("div");
-        score.className = "rankScore";
-        score.textContent = Number(item.score || 0).toLocaleString();
-
-        row.appendChild(rank);
-        row.appendChild(name);
-        row.appendChild(score);
+        const scoreCell = document.createElement("div");
+        scoreCell.className = "rankScore";
+        scoreCell.textContent = Number(item.score || 0).toLocaleString();
+        row.appendChild(rank); row.appendChild(name); row.appendChild(scoreCell);
         leaderboardList.appendChild(row);
     });
 }
 
 async function submitScore() {
     if (submitScoreButton.disabled) return;
-
     let name = playerNameInput.value.trim();
     if (!name) {
         submitStatus.textContent = "請先輸入你的暱稱！";
         playerNameInput.focus();
         return;
     }
-
     if (name.length > 20) name = name.substring(0, 20);
 
     submitScoreButton.disabled = true;
@@ -1012,26 +675,13 @@ async function submitScore() {
             body: JSON.stringify({ name: name, score: Math.floor(score) }),
             redirect: "follow"
         });
-
-        if (!response.ok) {
-            throw new Error("伺服器錯誤：" + response.status);
-        }
-
+        if (!response.ok) throw new Error("伺服器錯誤：" + response.status);
         const data = await response.json();
-
-        if (!data.success) {
-            throw new Error(data.error || "分數儲存失敗");
-        }
-
+        if (!data.success) throw new Error(data.error || "分數儲存失敗");
         submitStatus.textContent = "✓ 分數已成功上傳！";
         submitScoreButton.textContent = "✓ 已上傳";
-
-        if (data.leaderboard) {
-            renderLeaderboard(data.leaderboard);
-        } else {
-            await loadLeaderboard();
-        }
-
+        if (data.leaderboard) renderLeaderboard(data.leaderboard);
+        else await loadLeaderboard();
     } catch (error) {
         console.error("上傳分數失敗：", error);
         submitStatus.textContent = "✕ 上傳失敗，請確認 Apps Script 存取權限是否為「所有人」";
@@ -1056,9 +706,7 @@ resizeCanvas();
 updateHUD();
 createEnemies();
 drawGame();
-
 loadLeaderboard();
 </script>
-
 </body>
 </html>
