@@ -1,0 +1,731 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#09051b">
+<title>NEON RPS｜霓虹猜拳對決</title>
+
+<style>
+:root {
+  --bg:#09051b;--panel:#15102d;--cyan:#00f5ff;
+  --pink:#ff35c8;--purple:#a855ff;--green:#65ffb0;
+  --text:#f7f2ff;--muted:#a69cbd;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;min-height:100vh;color:var(--text);
+  background:radial-gradient(ellipse at 50% 0%,#301052 0%,transparent 55%),
+  linear-gradient(180deg,#09051b,#100722 70%,#080416);
+  font-family:Arial,"Microsoft JhengHei",sans-serif;overflow-x:hidden
+}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;
+  background-image:linear-gradient(#ffffff08 1px,transparent 1px),
+  linear-gradient(90deg,#ffffff08 1px,transparent 1px);
+  background-size:32px 32px;
+  mask-image:linear-gradient(to bottom,black,transparent 85%)
+}
+button,input{font:inherit}
+button{cursor:pointer;touch-action:manipulation}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,input:focus-visible{outline:2px solid white;outline-offset:3px}
+.topbar{
+  max-width:900px;margin:auto;padding:18px 20px;
+  display:flex;justify-content:space-between;align-items:center;gap:12px
+}
+.logo{font-weight:1000;letter-spacing:2px;color:var(--cyan)}
+.online{font-size:12px;color:var(--green)}
+main{width:min(900px,100%);margin:auto;padding:12px 18px 40px}
+.hero{text-align:center;padding:18px 0 24px}
+.kicker{color:var(--pink);font-size:12px;letter-spacing:5px;font-weight:800}
+h1{
+  font-size:clamp(34px,8vw,62px);line-height:1.1;margin:12px 0;
+  font-weight:1000;letter-spacing:2px;
+  text-shadow:0 0 12px #ff35c899,0 0 35px #a855ff66
+}
+.hero p{color:var(--muted);font-size:14px;line-height:1.8}
+.panel{
+  background:#15102de8;border:1px solid #a855ff55;border-radius:20px;
+  padding:clamp(18px,4vw,28px);margin:16px 0;
+  box-shadow:0 0 25px #6f20a51a,inset 0 0 22px #a855ff08
+}
+.panel-title{font-size:13px;color:var(--cyan);font-weight:900;letter-spacing:2px;margin:0 0 18px}
+.field-label{display:block;font-size:13px;color:#c7bddf;margin-bottom:8px}
+input{
+  width:100%;min-height:49px;border-radius:11px;border:1px solid #69528b;
+  background:#09051b;color:white;padding:12px 14px;font-size:16px
+}
+input::placeholder{color:#716583}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+.btn{
+  min-height:50px;border-radius:12px;border:1px solid var(--cyan);
+  color:var(--cyan);background:#00f5ff10;font-weight:900;
+  padding:12px 16px;transition:.15s;box-shadow:0 0 12px #00f5ff15
+}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:var(--cyan);color:#09051b;box-shadow:0 0 20px #00f5ff40}
+.btn.pink{border-color:var(--pink);color:var(--pink);background:#ff35c810}
+.btn.small{min-height:40px;padding:8px 12px;font-size:13px}
+.notice{min-height:24px;margin-top:14px;color:var(--muted);font-size:13px;line-height:1.7;overflow-wrap:anywhere}
+.hidden{display:none!important}
+.room-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.room-number{font-size:12px;color:var(--muted)}
+.room-number strong{
+  display:block;color:var(--pink);font-size:30px;letter-spacing:6px;
+  text-shadow:0 0 15px #ff35c855
+}
+.pill{padding:7px 11px;border-radius:100px;border:1px solid #65ffb055;color:var(--green);font-size:12px}
+.players{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:20px 0}
+.player{min-width:0;padding:14px 8px;text-align:center;border-radius:13px;background:#09051b;border:1px solid #44345f}
+.player.me{border-color:var(--cyan);box-shadow:inset 0 0 15px #00f5ff0c}
+.player .avatar{font-size:25px;margin-bottom:7px}
+.player .pname{font-size:13px;font-weight:800;overflow-wrap:anywhere}
+.player .pstatus{font-size:11px;margin-top:8px;color:var(--muted)}
+.player .wins{color:#ffd76a;font-size:12px;margin-top:6px}
+.game-area{text-align:center}
+.round-label{color:var(--muted);font-size:12px;letter-spacing:2px}
+#roundNumber{color:var(--cyan);font-weight:900}
+.status-message{min-height:54px;display:grid;place-items:center;font-weight:800;line-height:1.6;padding:10px 0}
+.choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:14px 0 18px}
+.choice{
+  min-width:0;min-height:130px;padding:14px 4px;border-radius:17px;
+  background:#0b0720;color:white;border:1px solid #5a4778;transition:.15s
+}
+.choice .emoji{display:block;font-size:clamp(35px,9vw,53px);margin-bottom:10px}
+.choice .label{display:block;font-size:14px;font-weight:900}
+.choice:active{transform:scale(.96)}
+.choice.selected{border-color:var(--cyan);background:#00f5ff18;box-shadow:0 0 22px #00f5ff30,inset 0 0 20px #00f5ff12}
+.choice:disabled{opacity:.65}
+.result-box{border:1px solid #ff35c855;border-radius:16px;background:#ff35c809;padding:16px;margin-top:14px}
+.result-title{font-size:24px;font-weight:1000;color:var(--pink)}
+.result-details{color:#c8bfdd;font-size:13px;line-height:1.9;margin-top:8px}
+.result-moves{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-top:12px}
+.move-chip{background:#0b0720;border:1px solid #4c3c68;border-radius:10px;padding:9px 12px;font-size:13px}
+.room-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.room-actions .btn{flex:1}
+.rules{color:var(--muted);font-size:12px;line-height:1.9}
+.footer{text-align:center;color:#716583;font-size:11px;padding:14px}
+@media(max-width:480px){
+  .topbar{padding:15px}main{padding:8px 12px 28px}.hero{padding-top:12px}
+  .actions{grid-template-columns:1fr}.players{gap:6px}
+  .player{padding:12px 4px}.choice{min-height:112px}.panel{border-radius:16px}
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="logo">⚡ NEON ARCADE</div>
+  <div class="online" id="connection">● 尚未連線</div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="kicker">MULTIPLAYER // LIVE BATTLE</div>
+    <h1>猜拳對決</h1>
+    <p>剪刀、石頭、布。讀懂對手，贏下這場霓虹對決。<br>
+    CREATE A ROOM · INVITE YOUR FRIENDS</p>
+  </section>
+
+  <section class="panel" id="lobby">
+    <h2 class="panel-title">01 / PLAYER SETUP</h2>
+    <label class="field-label" for="playerName">你的玩家名稱</label>
+    <input id="playerName" maxlength="12" placeholder="輸入暱稱，例如：NEON" autocomplete="nickname">
+
+    <div class="actions">
+      <button class="btn primary" id="createBtn">＋ 建立新房間</button>
+      <button class="btn pink" id="showJoinBtn">⇢ 加入房間</button>
+    </div>
+
+    <div id="joinArea" class="hidden" style="margin-top:20px">
+      <label class="field-label" for="roomInput">輸入 4 位數房號</label>
+      <input id="roomInput" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="例如：2048" autocomplete="off">
+      <button class="btn primary" id="joinBtn" style="width:100%;margin-top:12px">進入房間 →</button>
+    </div>
+    <div class="notice" id="lobbyNotice" role="status">請先設定暱稱，再建立或加入房間。</div>
+  </section>
+
+  <section class="panel hidden" id="roomPanel">
+    <div class="room-head">
+      <div class="room-number">ROOM CODE<strong id="roomCode">----</strong></div>
+      <div class="pill" id="roomCount">0 / 3 玩家</div>
+    </div>
+
+    <div class="players" id="playersList"></div>
+
+    <div class="game-area">
+      <div class="round-label">ROUND <span id="roundNumber">1</span></div>
+      <div class="status-message" id="gameStatus" role="status" aria-live="polite">等待更多玩家加入……</div>
+
+      <div class="choices" id="choices">
+        <button class="choice" data-move="scissors" aria-label="出剪刀">
+          <span class="emoji">✌️</span><span class="label">剪刀</span>
+        </button>
+        <button class="choice" data-move="rock" aria-label="出石頭">
+          <span class="emoji">✊</span><span class="label">石頭</span>
+        </button>
+        <button class="choice" data-move="paper" aria-label="出布">
+          <span class="emoji">✋</span><span class="label">布</span>
+        </button>
+      </div>
+
+      <div class="result-box hidden" id="resultBox">
+        <div class="result-title" id="resultTitle">ROUND RESULT</div>
+        <div class="result-details" id="resultDetails"></div>
+        <div class="result-moves" id="resultMoves"></div>
+      </div>
+    </div>
+
+    <div class="room-actions">
+      <button class="btn small" id="copyBtn">複製房號</button>
+      <button class="btn small pink" id="leaveBtn">離開房間</button>
+    </div>
+    <p class="rules">
+      遊戲規則：剪刀勝布、石頭勝剪刀、布勝石頭。<br>
+      2～3 人同時出拳，其他玩家的選擇會在結算前保密。平手不計勝場。
+    </p>
+  </section>
+
+  <div class="footer">NEON RPS // REALTIME MULTIPLAYER EXPERIENCE</div>
+</main>
+
+<!-- Firebase 相容版 SDK：App、Authentication、Realtime Database -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<script>
+// ======================================================
+// 1. 你的 Firebase 專案設定
+// ======================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyA0mIqAgpxHEWZ2zo4eyoSWTHRZjRXAKM8",
+  authDomain: "online-test-fa05c.firebaseapp.com",
+  databaseURL: "https://online-test-fa05c-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "online-test-fa05c",
+  storageBucket: "online-test-fa05c.firebasestorage.app",
+  messagingSenderId: "555471562516",
+  appId: "1:555471562516:web:5f5ac8ca76714af2114401",
+  measurementId: "G-LXDJH2C2L2"
+};
+
+// ======================================================
+// 2. 遊戲程式
+// ======================================================
+const $ = id => document.getElementById(id);
+const MOVES = {
+  scissors: {name:"剪刀",emoji:"✌️"},
+  rock: {name:"石頭",emoji:"✊"},
+  paper: {name:"布",emoji:"✋"}
+};
+
+let db = null;
+let auth = null;
+let authReady = null;
+let myId = null;
+let currentRoom = null;
+let roomRef = null;
+let roomListener = null;
+let roomData = null;
+let busy = false;
+let leaving = false;
+
+function setConnection(message, good = false) {
+  $("connection").textContent = (good ? "● " : "○ ") + message;
+  $("connection").style.color = good ? "var(--green)" : "var(--pink)";
+}
+
+function notice(message) {
+  $("lobbyNotice").textContent = message;
+}
+
+function getName() {
+  return $("playerName").value.trim().slice(0, 12);
+}
+
+// 初始化 Firebase 並登入匿名帳號。
+// Firebase Console 必須先啟用 Authentication > Anonymous。
+async function initFirebase() {
+  try {
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    auth = firebase.auth();
+    db = firebase.database();
+
+    if (!authReady) {
+      authReady = (async () => {
+        if (!auth.currentUser) {
+          await auth.signInAnonymously();
+        }
+        if (!auth.currentUser) {
+          throw new Error("匿名登入未完成，請重新整理網頁。");
+        }
+        myId = auth.currentUser.uid;
+      })();
+    }
+
+    await authReady;
+    setConnection("Firebase 已連線", true);
+    return true;
+  } catch (error) {
+    console.error("Firebase 初始化／登入失敗：", error);
+    authReady = null;
+    setConnection("登入失敗");
+    notice("Firebase 連線失敗：" + (error.message || "請檢查 Firebase 設定與匿名登入功能。"));
+    return false;
+  }
+}
+
+function setBusy(value) {
+  busy = value;
+  $("createBtn").disabled = value;
+  $("joinBtn").disabled = value;
+}
+
+function cleanRoomCode(value) {
+  return String(value || "").replace(/\D/g, "").slice(0, 4);
+}
+
+function roomPath(code) {
+  return db.ref("rooms/" + code);
+}
+
+async function createRoom() {
+  if (busy || currentRoom) return;
+
+  const name = getName();
+  if (!name) {
+    notice("請先輸入你的玩家名稱。");
+    $("playerName").focus();
+    return;
+  }
+
+  setBusy(true);
+  notice("正在連線並建立房間……");
+
+  try {
+    if (!await initFirebase()) return;
+
+    let createdCode = null;
+
+    for (let i = 0; i < 30; i++) {
+      const code = String(Math.floor(1000 + Math.random() * 9000));
+      const ref = roomPath(code);
+
+      const result = await ref.transaction(old => {
+        if (old !== null) return;
+        return {
+          createdAt: firebase.database.ServerValue.TIMESTAMP,
+          round: 1,
+          players: {
+            [myId]: {name, joinedAt: Date.now(), wins: 0}
+          },
+          choices: {},
+          lastResult: null
+        };
+      }, undefined, false);
+
+      if (result.committed) {
+        createdCode = code;
+        break;
+      }
+    }
+
+    if (!createdCode) throw new Error("無法取得空房號，請再試一次。");
+    enterRoom(createdCode);
+  } catch (error) {
+    console.error(error);
+    notice("建立失敗：" + (error.message || "請檢查資料庫規則。"));
+  } finally {
+    setBusy(false);
+  }
+}
+
+async function joinRoom() {
+  if (busy || currentRoom) return;
+
+  const name = getName();
+  const code = cleanRoomCode($("roomInput").value);
+  $("roomInput").value = code;
+
+  if (!name) {
+    notice("請先輸入你的玩家名稱。");
+    $("playerName").focus();
+    return;
+  }
+  if (code.length !== 4) {
+    notice("請輸入完整的 4 位數房號。");
+    return;
+  }
+
+  setBusy(true);
+  notice("正在加入房間 " + code + "……");
+
+  try {
+    if (!await initFirebase()) return;
+
+    const ref = roomPath(code);
+    const result = await ref.transaction(room => {
+      if (!room || !room.players) return;
+
+      if (room.players[myId]) {
+        room.players[myId].name = name;
+        return room;
+      }
+
+      if (Object.keys(room.players).length >= 3) return;
+
+      room.players[myId] = {
+        name,
+        joinedAt: Date.now(),
+        wins: 0
+      };
+      return room;
+    }, undefined, false);
+
+    if (!result.committed) {
+      const snap = await ref.once("value");
+      const data = snap.val();
+
+      if (!data) throw new Error("找不到這個房間，請確認房號。");
+      if (Object.keys(data.players || {}).length >= 3) {
+        throw new Error("房間已滿，最多只能有 3 位玩家。");
+      }
+      throw new Error("加入失敗，請確認資料庫權限後再試。");
+    }
+
+    enterRoom(code);
+  } catch (error) {
+    console.error(error);
+    notice(error.message || "加入失敗，請確認網路與資料庫規則。");
+  } finally {
+    setBusy(false);
+  }
+}
+
+function enterRoom(code) {
+  currentRoom = code;
+  roomRef = roomPath(code);
+  leaving = false;
+
+  $("lobby").classList.add("hidden");
+  $("roomPanel").classList.remove("hidden");
+  $("roomCode").textContent = code;
+  $("resultBox").classList.add("hidden");
+
+  roomListener = snapshot => {
+    if (leaving || !currentRoom) return;
+
+    roomData = snapshot.val();
+    if (!roomData) {
+      setConnection("房間已不存在");
+      $("gameStatus").textContent = "房間已關閉，請返回大廳重新建立或加入。";
+      return;
+    }
+
+    setConnection("房間連線中", true);
+    renderRoom();
+  };
+
+  roomRef.on("value", roomListener, error => {
+    console.error(error);
+    setConnection("資料庫讀取失敗");
+    $("gameStatus").textContent = "讀取失敗，請檢查 Firebase Database Rules。";
+  });
+
+  // 玩家斷線時自動移除玩家記錄。
+  // 注意：重新整理頁面或短暫斷線可能會被視為離開。
+  roomRef.child("players/" + myId).onDisconnect().remove();
+  roomRef.child("choices/" + myId).onDisconnect().remove();
+}
+
+function renderRoom() {
+  if (!roomData) return;
+
+  const players = roomData.players || {};
+  const ids = Object.keys(players);
+  const round = Number(roomData.round || 1);
+  const choices = roomData.choices || {};
+  const myChoice = choices[myId];
+  const chosenThisRound = !!(myChoice && myChoice.round === round);
+
+  $("roomCount").textContent = ids.length + " / 3 玩家";
+  $("roundNumber").textContent = round;
+  $("playersList").innerHTML = "";
+
+  ids.forEach((id, index) => {
+    const p = players[id];
+    const picked = choices[id] && choices[id].round === round;
+    const el = document.createElement("div");
+    el.className = "player" + (id === myId ? " me" : "");
+
+    el.innerHTML = `
+      <div class="avatar">${["🦊","🐸","🤖"][index] || "🎮"}</div>
+      <div class="pname"></div>
+      <div class="pstatus"></div>
+      <div class="wins">🏆 ${Number(p.wins || 0)} 勝</div>`;
+
+    el.querySelector(".pname").textContent =
+      p.name + (id === myId ? "（你）" : "");
+    el.querySelector(".pstatus").textContent =
+      picked ? "✓ 已出拳" : "等待出拳";
+    el.querySelector(".pstatus").style.color =
+      picked ? "var(--green)" : "var(--muted)";
+
+    $("playersList").appendChild(el);
+  });
+
+  for (let i = ids.length; i < 3; i++) {
+    const el = document.createElement("div");
+    el.className = "player";
+    el.innerHTML = '<div class="avatar">👤</div><div class="pname">等待玩家</div><div class="pstatus">尚未加入</div>';
+    $("playersList").appendChild(el);
+  }
+
+  const canPlay = ids.length >= 2 && ids.includes(myId);
+
+  $("choices").querySelectorAll("button").forEach(btn => {
+    btn.disabled = !canPlay || chosenThisRound || busy;
+    btn.classList.toggle(
+      "selected",
+      !!chosenThisRound && myChoice.move === btn.dataset.move
+    );
+  });
+
+  if (ids.length < 2) {
+    $("gameStatus").textContent = "等待朋友加入……至少需要 2 位玩家才能開始。";
+  } else if (chosenThisRound) {
+    $("gameStatus").textContent = "你已經出拳！等待其他玩家選擇。";
+  } else {
+    $("gameStatus").textContent = "選擇你的拳法！其他人的選擇尚未公開。";
+  }
+
+  const result = roomData.lastResult;
+  if (result && result.round === round - 1) {
+    renderResult(result);
+  } else {
+    $("resultBox").classList.add("hidden");
+  }
+}
+
+function getRoundOutcome(players, choices, round) {
+  const ids = Object.keys(players);
+  const currentChoices = {};
+
+  for (const id of ids) {
+    const c = choices[id];
+    if (!c || c.round !== round || !MOVES[c.move]) return null;
+    currentChoices[id] = c.move;
+  }
+
+  const values = Object.values(currentChoices);
+  const unique = [...new Set(values)];
+  let winners = [];
+  let message = "";
+
+  if (unique.length === 1 || unique.length === 3) {
+    message = "平手！再來一局";
+  } else {
+    const a = unique[0], b = unique[1];
+    const aBeatsB =
+      (a === "rock" && b === "scissors") ||
+      (a === "scissors" && b === "paper") ||
+      (a === "paper" && b === "rock");
+
+    const winningMove = aBeatsB ? a : b;
+    winners = ids.filter(id => currentChoices[id] === winningMove);
+    message = winners.length === 1 ? "本局勝者！" : "多人獲勝！";
+  }
+
+  return {round, choices:currentChoices, winners, message};
+}
+
+async function submitMove(move) {
+  if (!roomRef || !roomData || busy || !MOVES[move]) return;
+
+  const round = Number(roomData.round || 1);
+  const players = roomData.players || {};
+  const ids = Object.keys(players);
+
+  if (ids.length < 2 || !ids.includes(myId)) return;
+
+  const mine = (roomData.choices || {})[myId];
+  if (mine && mine.round === round) return;
+
+  busy = true;
+  $("choices").querySelectorAll("button").forEach(b => b.disabled = true);
+
+  try {
+    await roomRef.transaction(room => {
+      if (!room || !room.players || !room.players[myId]) return;
+
+      const nowRound = Number(room.round || 1);
+      if (nowRound !== round) return;
+
+      room.choices = room.choices || {};
+      const existing = room.choices[myId];
+      if (existing && existing.round === nowRound) return;
+
+      room.choices[myId] = {
+        move,
+        round: nowRound,
+        timestamp: Date.now()
+      };
+
+      const outcome = getRoundOutcome(room.players, room.choices, nowRound);
+
+      if (outcome) {
+        outcome.names = {};
+        outcome.moveNames = {};
+
+        Object.keys(outcome.choices).forEach(id => {
+          outcome.names[id] = room.players[id].name;
+          outcome.moveNames[id] = outcome.choices[id];
+        });
+
+        outcome.winners.forEach(id => {
+          room.players[id].wins = Number(room.players[id].wins || 0) + 1;
+        });
+
+        room.lastResult = outcome;
+        room.round = nowRound + 1;
+      }
+
+      return room;
+    }, undefined, false);
+  } catch (error) {
+    console.error(error);
+    $("gameStatus").textContent = "出拳失敗，請確認連線和資料庫規則。";
+  } finally {
+    busy = false;
+    if (roomData) renderRoom();
+  }
+}
+
+function renderResult(result) {
+  $("resultBox").classList.remove("hidden");
+
+  const winners = result.winners || [];
+  let title;
+
+  if (winners.length === 0) title = "DRAW / 平手";
+  else if (winners.includes(myId)) title = "YOU WIN! / 本局獲勝";
+  else title = "ROUND OVER / 本局結束";
+
+  $("resultTitle").textContent = title;
+
+  $("resultDetails").textContent =
+    result.names && winners.length
+      ? "獲勝者：" + winners.map(id => result.names[id] || "玩家").join("、")
+      : "本局平手，沒有人獲勝。";
+
+  $("resultMoves").innerHTML = "";
+
+  const names = result.names || {};
+  const moves = result.moveNames || result.choices || {};
+
+  Object.keys(moves).forEach(id => {
+    const move = MOVES[moves[id]];
+    if (!move) return;
+
+    const chip = document.createElement("div");
+    chip.className = "move-chip";
+    chip.textContent = (names[id] || "玩家") + "：" + move.emoji + " " + move.name;
+    $("resultMoves").appendChild(chip);
+  });
+}
+
+async function leaveRoom() {
+  if (!currentRoom || leaving) return;
+
+  const oldRef = roomRef;
+  const oldCode = currentRoom;
+  leaving = true;
+
+  try {
+    if (roomListener) oldRef.off("value", roomListener);
+
+    await oldRef.child("players/" + myId).onDisconnect().cancel();
+    await oldRef.child("choices/" + myId).onDisconnect().cancel();
+
+    await oldRef.transaction(room => {
+      if (!room || !room.players) return room;
+
+      delete room.players[myId];
+      if (room.choices) delete room.choices[myId];
+
+      if (Object.keys(room.players).length < 2) {
+        room.choices = {};
+      }
+
+      return room;
+    }, undefined, false);
+  } catch (error) {
+    console.warn("離開房間時發生問題：", error);
+  }
+
+  currentRoom = null;
+  roomRef = null;
+  roomListener = null;
+  roomData = null;
+  leaving = false;
+
+  $("roomPanel").classList.add("hidden");
+  $("lobby").classList.remove("hidden");
+  $("joinArea").classList.add("hidden");
+
+  notice("已離開房間 " + oldCode + "。你可以建立或加入其他房間。");
+}
+
+$("createBtn").addEventListener("click", createRoom);
+
+$("showJoinBtn").addEventListener("click", () => {
+  $("joinArea").classList.toggle("hidden");
+  if (!$("joinArea").classList.contains("hidden")) {
+    $("roomInput").focus();
+  }
+});
+
+$("joinBtn").addEventListener("click", joinRoom);
+
+$("roomInput").addEventListener("input", () => {
+  $("roomInput").value = cleanRoomCode($("roomInput").value);
+});
+
+$("roomInput").addEventListener("keydown", e => {
+  if (e.key === "Enter") joinRoom();
+});
+
+$("playerName").addEventListener("keydown", e => {
+  if (e.key === "Enter") createRoom();
+});
+
+$("choices").querySelectorAll("button").forEach(btn => {
+  btn.addEventListener("click", () => submitMove(btn.dataset.move));
+});
+
+$("leaveBtn").addEventListener("click", leaveRoom);
+
+$("copyBtn").addEventListener("click", async () => {
+  if (!currentRoom) return;
+
+  try {
+    await navigator.clipboard.writeText(currentRoom);
+    $("copyBtn").textContent = "已複製 ✓";
+    setTimeout(() => $("copyBtn").textContent = "複製房號", 1500);
+  } catch {
+    window.prompt("請複製房號：", currentRoom);
+  }
+});
+
+$("playerName").value = localStorage.getItem("neonRpsName") || "";
+
+$("playerName").addEventListener("change", () => {
+  localStorage.setItem("neonRpsName", getName());
+});
+
+// 頁面啟動時先檢查 Firebase 連線及匿名登入。
+initFirebase();
+</script>
+</body>
+</html>
