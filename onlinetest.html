@@ -271,7 +271,17 @@ async function initFirebase() {
     console.error("Firebase 初始化／登入失敗：", error);
     authReady = null;
     setConnection("登入失敗");
-    notice("Firebase 連線失敗：" + (error.message || "請檢查 Firebase 設定與匿名登入功能。"));
+
+    // 對常見的 Firebase Authentication 設定錯誤提供明確提示。
+    const code = error && error.code ? error.code : "";
+    let helpMessage = error && error.message ? error.message : "請檢查 Firebase 設定。";
+    if (code === "auth/configuration-not-found" || code === "auth/operation-not-allowed") {
+      helpMessage = "請到 Firebase Console → Authentication → Sign-in method，啟用「匿名（Anonymous）」登入；若尚未開始使用 Authentication，請先按「開始使用」。";
+    } else if (code === "auth/unauthorized-domain") {
+      helpMessage = "目前網域尚未授權，請到 Firebase Console → Authentication → Settings → Authorized domains，加入你網站的網域。";
+    }
+
+    notice("Firebase 連線失敗：" + helpMessage);
     return false;
   }
 }
