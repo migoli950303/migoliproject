@@ -1,0 +1,145 @@
+name: Update Google Alerts News
+
+on:
+  schedule:
+    # 每天台灣時間 08:00（UTC 00:00）
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-google-alerts-news
+  cancel-in-progress: false
+
+jobs:
+  update-news:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Fetch Google Alerts RSS and generate news.json
+        env:
+          RSS_URL: "https://www.google.com/alerts/feeds/16866799962723511957/2069991230685013890"
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import re
+          import urllib.request
+          import xml.etree.ElementTree as ET
+          from datetime import datetime, timezone
+          from email.utils import parsedate_to_datetime
+          from html.parser import HTMLParser
+
+          RSS_URL = os.environ["RSS_URL"]
+          OUTPUT = "news.json"
+          MAX_ITEMS = 30
+
+          class TextExtractor(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.parts = []
+
+              def handle_data(self, data):
+                  self.parts.append(data)
+
+              def text(self):
+                  return re.sub(r"\s+", " ", " ".join(self.parts)).strip()
+
+          def clean_html(value):
+              parser = TextExtractor()
+              try:
+                  parser.feed(value or "")
+                  return parser.text()
+              except Exception:
+                  return re.sub(r"<[^>]+>", " ", value or "").strip()
+
+          def child_text(element, names):
+              for child in list(element):
+                  if child.tag.split("}")[-1] in names:
+                      return "".join(child.itertext()).strip()
+              return ""
+
+          def entry_link(entry):
+              for child in list(entry):
+                  if child.tag.split("}")[-1] == "link":
+                      href = child.attrib.get("href")
+                      if href:
+                          return href
+                      if child.text:
+                          return child.text.strip()
+              return ""
+
+          def parse_date(value):
+              if not value:
+                  return ""
+              try:
+                  dt = datetime.fromisoformat(value.replace("Z", "+00:00"))
+              except ValueError:
+                  try:
+                      dt = parsedate_to_datetime(value)
+                  except (TypeError, ValueError, OverflowError):
+                      return value
+              if dt.tzinfo is None:
+                  dt = dt.replace(tzinfo=timezone.utc)
+              return dt.astimezone(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+
+          request = urllib.request.Request(
+              RSS_URL,
+              headers={"User-Agent": "Mozilla/5.0 (compatible; GitHubActionsNewsBot/1.0)"}
+          )
+          with urllib.request.urlopen(request, timeout=30) as response:
+              xml_data = response.read()
+
+          root = ET.fromstring(xml_data)
+          entries = [
+              element for element in root.iter()
+              if element.tag.split("}")[-1] in ("entry", "item")
+          ]
+
+          news = []
+          for entry in entries[:MAX_ITEMS]:
+              title = child_text(entry, {"title"})
+              link = entry_link(entry)
+              summary = child_text(entry, {"summary", "description", "content"})
+              published = child_text(entry, {"published", "updated", "pubDate", "date"})
+
+              if not title or not link:
+                  continue
+
+              source = child_text(entry, {"source"})
+              news.append({
+                  "title": clean_html(title),
+                  "link": link,
+                  "date": parse_date(published),
+                  "source": clean_html(source),
+                  "summary": clean_html(summary)
+              })
+
+          with open(OUTPUT, "w", encoding="utf-8") as file:
+              json.dump(news, file, ensure_ascii=False, indent=2)
+              file.write("\n")
+
+          print(f"已寫入 {len(news)} 則新聞至 {OUTPUT}")
+          PY
+
+      - name: Commit and push news.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add news.json
+          if git diff --cached --quiet; then
+            echo "news.json 沒有變更，不需要提交。"
+          else
+            git commit -m "chore: update latest news"
+            git push
+          fi
