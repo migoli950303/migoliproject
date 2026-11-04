@@ -329,6 +329,62 @@
       box-shadow: 0 18px 55px rgba(115,245,209,.32);
     }
 
+
+    /* 最新消息 */
+    .news-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .news-item {
+      padding: 20px 22px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255,255,255,.035);
+      transition: border-color .25s ease, transform .25s ease;
+    }
+
+    .news-item:hover {
+      transform: translateY(-3px);
+      border-color: rgba(115,245,209,.4);
+    }
+
+    .news-item a {
+      display: block;
+    }
+
+    .news-item h3 {
+      margin: 0 0 8px;
+      color: var(--text);
+      font-size: 1.08rem;
+      line-height: 1.55;
+    }
+
+    .news-item a:hover h3 {
+      color: var(--accent);
+    }
+
+    .news-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 14px;
+      margin-bottom: 8px;
+      color: var(--accent);
+      font-size: .82rem;
+    }
+
+    .news-summary {
+      margin: 0;
+      color: var(--muted);
+      font-size: .94rem;
+      overflow-wrap: anywhere;
+    }
+
+    .news-status {
+      margin: 0;
+      color: var(--muted);
+    }
+
     footer {
       border-top: 1px solid var(--line);
       padding: 55px 0 35px;
@@ -423,7 +479,7 @@
       <a class="brand" href="#home">migoli</a>
       <div class="nav-links">
         <a href="#home">首頁</a>
-        <a href="#news">News<span class="soon">Coming soon</span></a>
+        <a href="#news">News</a>
         <a href="#tools">Tools<span class="soon">Coming soon</span></a>
         <a href="#games">Games</a>
       </div>
@@ -491,9 +547,11 @@
     <section id="news">
       <div class="container">
         <div class="section-label">NEWS</div>
-        <h2>News</h2>
+        <h2>最新消息</h2>
         <div class="about-card">
-          <p>Coming soon</p>
+          <div id="news-list" class="news-list" aria-live="polite">
+            <p class="news-status">正在載入最新消息……</p>
+          </div>
         </div>
       </div>
     </section>
@@ -543,5 +601,87 @@
       <div class="copyright">migoli</div>
     </div>
   </footer>
+
+  <script>
+    // 從 GitHub Pages 同一目錄讀取 GitHub Actions 產生的 news.json
+    async function loadLatestNews() {
+      const newsList = document.getElementById('news-list');
+
+      try {
+        const response = await fetch('./news.json?ts=' + Date.now(), {
+          cache: 'no-store'
+        });
+
+        if (!response.ok) {
+          throw new Error('news.json 載入失敗（HTTP ' + response.status + '）');
+        }
+
+        const news = await response.json();
+        newsList.replaceChildren();
+
+        if (!Array.isArray(news) || news.length === 0) {
+          const empty = document.createElement('p');
+          empty.className = 'news-status';
+          empty.textContent = '目前沒有最新消息，請稍後再查看。';
+          newsList.appendChild(empty);
+          return;
+        }
+
+        news.forEach(item => {
+          const article = document.createElement('article');
+          article.className = 'news-item';
+
+          const link = document.createElement('a');
+          link.href = item.link || '#';
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+
+          const title = document.createElement('h3');
+          title.textContent = item.title || '未提供標題';
+          link.appendChild(title);
+          article.appendChild(link);
+
+          const meta = document.createElement('div');
+          meta.className = 'news-meta';
+
+          if (item.source) {
+            const source = document.createElement('span');
+            source.textContent = item.source;
+            meta.appendChild(source);
+          }
+
+          if (item.date) {
+            const date = document.createElement('time');
+            date.textContent = item.date;
+            meta.appendChild(date);
+          }
+
+          if (meta.childNodes.length) {
+            article.appendChild(meta);
+          }
+
+          if (item.summary) {
+            const summary = document.createElement('p');
+            summary.className = 'news-summary';
+            summary.textContent = item.summary;
+            article.appendChild(summary);
+          }
+
+          newsList.appendChild(article);
+        });
+      } catch (error) {
+        console.error('最新消息載入錯誤：', error);
+        newsList.replaceChildren();
+
+        const message = document.createElement('p');
+        message.className = 'news-status';
+        message.textContent = '目前無法載入最新消息，請稍後再試。';
+        newsList.appendChild(message);
+      }
+    }
+
+    loadLatestNews();
+  </script>
+
 </body>
 </html>
