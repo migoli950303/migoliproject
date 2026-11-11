@@ -4,7 +4,25 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>migoli｜個人首頁</title>
-  <meta name="description" content="migoli 個人首頁">
+  <meta name="description" content="大同大學媒體設計系學生，專注網頁設計、UI/UX 與互動程式作品。">
+  <link rel="canonical" href="https://migoli950303.github.io/migoliproject/">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="favicon.png">
+
+  <!-- Open Graph：LINE、Facebook 等社群分享預覽 -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="migoli｜個人首頁">
+  <meta property="og:title" content="migoli｜個人首頁">
+  <meta property="og:description" content="大同大學媒體設計系學生，專注網頁設計、UI/UX 與互動程式作品。">
+  <meta property="og:url" content="https://migoli950303.github.io/migoliproject/">
+  <meta property="og:image" content="https://migoli950303.github.io/migoliproject/og.jpg">
+  <meta property="og:image:alt" content="migoli 個人網站分享圖片">
+
+  <!-- Google 搜尋與其他平台使用的頁面摘要 -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="migoli｜個人首頁">
+  <meta name="twitter:description" content="大同大學媒體設計系學生，專注網頁設計、UI/UX 與互動程式作品。">
+  <meta name="twitter:image" content="https://migoli950303.github.io/migoliproject/og.jpg">
   <style>
     :root {
       --bg: #07111f;
@@ -296,6 +314,42 @@
       box-shadow: 0 18px 50px rgba(125,168,255,.28);
     }
 
+    /* 首頁分享按鈕 */
+    .share-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .share-button {
+      min-height: 44px;
+      padding: 0 20px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--glass);
+      color: var(--text);
+      font: inherit;
+      font-size: .94rem;
+      font-weight: 700;
+      cursor: pointer;
+      backdrop-filter: blur(14px);
+      transition: transform .25s ease, border-color .25s ease, background .25s ease;
+    }
+
+    .share-button:hover {
+      transform: translateY(-3px);
+      border-color: rgba(115,245,209,.5);
+      background: rgba(255,255,255,.09);
+    }
+
+    .share-status {
+      min-height: 1.5em;
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: .86rem;
+    }
+
     /* Games 區塊的小遊戲按鈕 */
     .game-button {
       margin-top: 18px;
@@ -429,6 +483,14 @@
         margin-top: 36px;
       }
 
+      .share-buttons {
+        gap: 10px;
+      }
+
+      .share-button {
+        flex: 1 1 auto;
+      }
+
       .about-card { padding: 26px; }
 
       .profile-photo {
@@ -491,10 +553,16 @@
       <div class="container hero-content">
         <div class="eyebrow">Personal Profile</div>
         <h1>migoli</h1>
-        <p class="identity">大同大學數位媒體設計學系學生</p>
+        <p class="identity">大同大學媒體設計系學生，專注網頁設計、UI/UX 與互動程式作品。</p>
         <div class="hero-glass">
           2024年入學，預計於 2028年 7 月畢業。
         </div>
+        <div class="share-buttons" aria-label="分享網站">
+          <a class="share-button" href="https://social-plugins.line.me/lineit/share?url=https%3A%2F%2Fmigoli950303.github.io%2Fmigoliproject%2F" target="_blank" rel="noopener noreferrer">LINE 分享</a>
+          <a class="share-button" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fmigoli950303.github.io%2Fmigoliproject%2F" target="_blank" rel="noopener noreferrer">Facebook 分享</a>
+          <button class="share-button" id="native-share-button" type="button">手機分享</button>
+        </div>
+        <p class="share-status" id="share-status" role="status" aria-live="polite"></p>
       </div>
     </section>
 
@@ -681,6 +749,54 @@
     }
 
     loadLatestNews();
+
+    // 手機使用系統分享選單；桌面版則複製首頁網址。
+    const shareButton = document.getElementById('native-share-button');
+    const shareStatus = document.getElementById('share-status');
+    const pageUrl = 'https://migoli950303.github.io/migoliproject/';
+    const pageTitle = 'migoli｜個人首頁';
+
+    async function copyPageUrl() {
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(pageUrl);
+        } else {
+          const temporaryInput = document.createElement('textarea');
+          temporaryInput.value = pageUrl;
+          temporaryInput.style.position = 'fixed';
+          temporaryInput.style.opacity = '0';
+          document.body.appendChild(temporaryInput);
+          temporaryInput.select();
+          const copied = document.execCommand('copy');
+          temporaryInput.remove();
+          if (!copied) throw new Error('複製失敗');
+        }
+        shareStatus.textContent = '網址已複製，可以分享給朋友了！';
+      } catch (error) {
+        shareStatus.textContent = '無法自動複製，請手動複製網址：https://migoli950303.github.io/migoliproject/';
+      }
+    }
+
+    shareButton.addEventListener('click', async () => {
+      const isMobile = window.matchMedia('(pointer: coarse)').matches;
+
+      if (isMobile && typeof navigator.share === 'function') {
+        try {
+          await navigator.share({
+            title: pageTitle,
+            text: '大同大學媒體設計系學生，專注網頁設計、UI/UX 與互動程式作品。',
+            url: pageUrl
+          });
+          shareStatus.textContent = '';
+        } catch (error) {
+          if (error.name !== 'AbortError') {
+            shareStatus.textContent = '分享功能暫時無法使用。';
+          }
+        }
+      } else {
+        await copyPageUrl();
+      }
+    });
   </script>
 
 </body>
