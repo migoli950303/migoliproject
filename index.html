@@ -460,6 +460,92 @@
       opacity: .65;
     }
 
+
+    /* 今日天氣小卡：延續首頁的玻璃擬態與藍綠漸層 */
+    .weather-card {
+      display: block;
+      width: min(100%, 520px);
+      margin-top: 28px;
+      padding: 20px 24px;
+      border: 1px solid rgba(115,245,209,.28);
+      border-radius: 22px;
+      background: linear-gradient(135deg, rgba(10,24,42,.78), rgba(20,45,70,.48));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+      transition: transform .25s ease, border-color .25s ease, background .25s ease;
+    }
+
+    .weather-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(115,245,209,.65);
+      background: linear-gradient(135deg, rgba(10,32,49,.9), rgba(30,55,85,.62));
+    }
+
+    .weather-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .weather-card-label {
+      color: var(--accent);
+      font-size: .82rem;
+      letter-spacing: .12em;
+      font-weight: 800;
+    }
+
+    .weather-card-location {
+      color: var(--muted);
+      font-size: .85rem;
+    }
+
+    .weather-card-main {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .weather-card-icon {
+      font-size: 2.8rem;
+      line-height: 1.2;
+      flex-shrink: 0;
+    }
+
+    .weather-card-temp {
+      font-size: clamp(2.2rem, 7vw, 3rem);
+      line-height: 1.1;
+      font-weight: 800;
+      letter-spacing: -.04em;
+    }
+
+    .weather-card-condition {
+      margin-top: 5px;
+      color: #dce9f5;
+      font-size: 1rem;
+    }
+
+    .weather-card-rain {
+      margin: 16px 0 0;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: .92rem;
+    }
+
+    .weather-card-rain strong {
+      color: var(--accent);
+    }
+
+    .weather-card-hint {
+      display: block;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: .78rem;
+      opacity: .8;
+    }
+
     @media (max-width: 760px) {
       .container {
         width: min(100% - 28px, 600px);
@@ -563,6 +649,21 @@
           <button class="share-button" id="native-share-button" type="button">手機分享</button>
         </div>
         <p class="share-status" id="share-status" role="status" aria-live="polite"></p>
+        <a class="weather-card" href="weather.html" aria-label="查看完整天氣預報">
+          <div class="weather-card-top">
+            <span class="weather-card-label">TODAY'S WEATHER</span>
+            <span class="weather-card-location">台北 · 今日天氣 ↗</span>
+          </div>
+          <div class="weather-card-main">
+            <span class="weather-card-icon" id="weather-icon" aria-hidden="true">🌤️</span>
+            <div>
+              <div class="weather-card-temp" id="weather-temperature">載入中…</div>
+              <div class="weather-card-condition" id="weather-condition">正在取得台北天氣</div>
+            </div>
+          </div>
+          <p class="weather-card-rain" id="weather-rain" role="status" aria-live="polite">☔ 正在查詢今日降雨機率…</p>
+          <span class="weather-card-hint">點擊卡片查看完整天氣預報</span>
+        </a>
       </div>
     </section>
 
@@ -749,6 +850,85 @@
     }
 
     loadLatestNews();
+
+
+    // 今日天氣小卡：使用 Open-Meteo 免費 API，預設顯示台北
+    async function loadTodayWeather() {
+      const temperatureEl = document.getElementById('weather-temperature');
+      const conditionEl = document.getElementById('weather-condition');
+      const iconEl = document.getElementById('weather-icon');
+      const rainEl = document.getElementById('weather-rain');
+
+      const weatherDescriptions = {
+        0: ['晴朗', '☀️'],
+        1: ['大致晴朗', '🌤️'],
+        2: ['晴時多雲', '⛅'],
+        3: ['多雲', '☁️'],
+        45: ['有霧', '🌫️'],
+        48: ['霧凇霧', '🌫️'],
+        51: ['毛毛雨', '🌦️'],
+        53: ['毛毛雨', '🌦️'],
+        55: ['較強毛毛雨', '🌧️'],
+        56: ['凍毛毛雨', '🌧️'],
+        57: ['較強凍毛毛雨', '🌧️'],
+        61: ['小雨', '🌧️'],
+        63: ['中雨', '🌧️'],
+        65: ['大雨', '🌧️'],
+        66: ['凍雨', '🌧️'],
+        67: ['較強凍雨', '🌧️'],
+        71: ['小雪', '🌨️'],
+        73: ['中雪', '🌨️'],
+        75: ['大雪', '❄️'],
+        77: ['雪粒', '🌨️'],
+        80: ['短暫陣雨', '🌦️'],
+        81: ['陣雨', '🌧️'],
+        82: ['強陣雨', '⛈️'],
+        85: ['陣雪', '🌨️'],
+        86: ['強陣雪', '❄️'],
+        95: ['雷雨', '⛈️'],
+        96: ['雷雨伴隨冰雹', '⛈️'],
+        99: ['強雷雨伴隨冰雹', '⛈️']
+      };
+
+      try {
+        const apiUrl = 'https://api.open-meteo.com/v1/forecast'
+          + '?latitude=25.0330&longitude=121.5654'
+          + '&current=temperature_2m,weather_code'
+          + '&hourly=precipitation_probability'
+          + '&daily=precipitation_probability_max'
+          + '&timezone=Asia%2FTaipei&forecast_days=1';
+
+        const response = await fetch(apiUrl);
+        if (!response.ok) throw new Error('天氣資料讀取失敗');
+
+        const data = await response.json();
+        const current = data.current;
+        const weather = weatherDescriptions[current.weather_code] || ['天氣資訊', '🌤️'];
+
+        temperatureEl.textContent = `${Math.round(current.temperature_2m)}°C`;
+        conditionEl.textContent = weather[0];
+        iconEl.textContent = weather[1];
+
+        const rainProbability = data.daily.precipitation_probability_max?.[0];
+
+        if (rainProbability == null) {
+          rainEl.textContent = '☔ 今日降雨機率暫時無法取得';
+        } else {
+          const rainText = rainProbability >= 30
+            ? '今天有下雨機會，出門建議帶傘'
+            : '今天降雨機率偏低';
+          rainEl.innerHTML = `☔ 今日降雨機率 <strong>${rainProbability}%</strong>・${rainText}`;
+        }
+      } catch (error) {
+        console.error('今日天氣載入錯誤：', error);
+        temperatureEl.textContent = '--°C';
+        conditionEl.textContent = '天氣資料暫時無法載入';
+        iconEl.textContent = '🌥️';
+        rainEl.textContent = '☔ 請點擊卡片查看天氣預報，或稍後重試。';
+      }
+    }
+
+    loadTodayWeather();
 
     // 手機使用系統分享選單；桌面版則複製首頁網址。
     const shareButton = document.getElementById('native-share-button');
