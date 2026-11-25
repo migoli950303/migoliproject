@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#081334">
+  <title>圖片格式轉換器｜PNG、JPG、WebP</title>
+  <meta name="description" content="免費、簡單又方便的線上圖片格式轉換工具，可在瀏覽器中將圖片轉換為 PNG、JPG 或 WebP，支援預覽與下載，無需上傳圖片。">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="favicon.png">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="圖片格式轉換器｜PNG、JPG、WebP">
+  <meta property="og:description" content="直接在瀏覽器中將圖片轉換為 PNG、JPG 或 WebP，預覽結果並下載。免費使用，圖片不需上傳。">
+  <meta property="og:image" content="https://migoli950303.github.io/migoliproject/og.jpg">
+  <meta property="og:url" content="https://migoli950303.github.io/migoliproject/changeimage.html">
+  <meta property="og:locale" content="zh_TW">
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VYRSBB2XY6"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-VYRSBB2XY6');
+  </script>
+
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #061136;
+      --panel: rgba(13, 30, 75, .82);
+      --line: rgba(100, 145, 255, .24);
+      --blue: #2868ed;
+      --cyan: #00e5bd;
+      --text: #f5f7ff;
+      --muted: #aebde4;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans TC", sans-serif;
+      background:
+        radial-gradient(ellipse at 12% 5%, rgba(35, 92, 224, .28), transparent 42%),
+        radial-gradient(ellipse at 90% 30%, rgba(0, 229, 189, .12), transparent 34%),
+        var(--bg);
+    }
+    a { color: inherit; }
+    .page { width: min(100% - 32px, 960px); margin: 0 auto; padding: 30px 0 44px; }
+    header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 30px; }
+    .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; font-weight: 800; letter-spacing: .03em; }
+    .brand img { width: 42px; height: 42px; object-fit: contain; border-radius: 12px; }
+    .back { color: var(--muted); text-decoration: none; border: 1px solid var(--line); border-radius: 999px; padding: 10px 15px; font-size: .92rem; }
+    .back:hover { color: white; border-color: var(--cyan); }
+    .hero { text-align: center; margin: 32px 0 28px; }
+    .eyebrow { color: var(--cyan); text-transform: uppercase; font-size: .78rem; letter-spacing: .2em; font-weight: 800; }
+    h1 { font-size: clamp(2rem, 6vw, 3.3rem); margin: 12px 0; line-height: 1.15; }
+    .hero p { max-width: 650px; margin: 0 auto; color: var(--muted); line-height: 1.8; }
+    .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 24px; padding: clamp(18px, 4vw, 32px); box-shadow: 0 24px 70px rgba(0,0,0,.22); backdrop-filter: blur(14px); }
+    .dropzone { border: 2px dashed rgba(110, 153, 255, .55); border-radius: 18px; padding: 30px 16px; text-align: center; background: rgba(5, 17, 52, .45); transition: .2s; }
+    .dropzone.dragover { border-color: var(--cyan); background: rgba(0,229,189,.08); }
+    .upload-icon { width: 58px; height: 58px; margin: 0 auto 12px; border-radius: 18px; display: grid; place-items: center; background: rgba(40,104,237,.2); color: var(--cyan); font-size: 1.8rem; }
+    .dropzone h2 { margin: 0 0 7px; font-size: 1.15rem; }
+    .dropzone p { color: var(--muted); margin: 0 0 17px; font-size: .92rem; }
+    input[type=file] { display: none; }
+    .button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 12px; padding: 12px 18px; font: inherit; font-weight: 750; cursor: pointer; text-decoration: none; transition: transform .15s, opacity .15s; }
+    .button:hover { transform: translateY(-1px); }
+    .primary { color: #04142d; background: linear-gradient(135deg, #00e5bd, #8af5df); }
+    .secondary { color: white; background: #1a3475; border: 1px solid var(--line); }
+    .button:disabled { opacity: .42; cursor: not-allowed; transform: none; }
+    .settings { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 22px; }
+    .field label { display: block; color: var(--muted); font-size: .88rem; margin-bottom: 8px; }
+    select, input[type=number] { width: 100%; border: 1px solid var(--line); border-radius: 12px; padding: 12px 13px; color: var(--text); background: #091944; font: inherit; outline: none; }
+    select:focus, input:focus { border-color: var(--cyan); }
+    .quality-wrap { display: flex; align-items: center; gap: 12px; }
+    input[type=range] { width: 100%; accent-color: var(--cyan); }
+    #qualityValue { min-width: 42px; text-align: right; color: var(--cyan); font-variant-numeric: tabular-nums; }
+    .file-info { color: var(--muted); font-size: .86rem; margin-top: 16px; overflow-wrap: anywhere; }
+    .preview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 22px; }
+    .preview-card { min-width: 0; padding: 14px; border: 1px solid var(--line); border-radius: 16px; background: rgba(4, 13, 42, .45); }
+    .preview-card h3 { margin: 0 0 12px; font-size: .95rem; }
+    .preview-box { min-height: 180px; display: grid; place-items: center; overflow: hidden; border-radius: 10px; background-color: rgba(255,255,255,.035); background-image: linear-gradient(45deg, #18244a 25%, transparent 25%), linear-gradient(-45deg, #18244a 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #18244a 75%), linear-gradient(-45deg, transparent 75%, #18244a 75%); background-size: 20px 20px; background-position: 0 0, 0 10px, 10px -10px, -10px 0; }
+    .preview-box img { display: block; max-width: 100%; max-height: 330px; object-fit: contain; }
+    .placeholder { color: #7184b5; font-size: .9rem; padding: 20px; text-align: center; }
+    .preview-meta { color: var(--muted); font-size: .8rem; margin-top: 10px; overflow-wrap: anywhere; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    .status { min-height: 24px; color: var(--cyan); margin-top: 14px; font-size: .9rem; }
+    .note { color: var(--muted); font-size: .85rem; line-height: 1.8; margin: 20px 2px 0; }
+    footer { text-align: center; color: #7f91bf; font-size: .8rem; padding-top: 26px; }
+    @media (max-width: 600px) {
+      .page { width: min(100% - 20px, 960px); padding-top: 18px; }
+      header { margin-bottom: 20px; }
+      .brand { font-size: .92rem; gap: 8px; }
+      .brand img { width: 34px; height: 34px; }
+      .back { padding: 8px 11px; font-size: .82rem; }
+      .hero { margin: 25px 0 22px; }
+      .panel { border-radius: 19px; }
+      .settings, .preview-grid { grid-template-columns: 1fr; }
+      .preview-box { min-height: 150px; }
+      .actions .button { flex: 1 1 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header>
+      <a class="brand" href="index.html" aria-label="返回個人網站首頁">
+        <img src="favicon.png" alt="">
+        <span>migoli 的工具箱</span>
+      </a>
+      <a class="back" href="index.html">← 回首頁</a>
+    </header>
+
+    <section class="hero">
+      <div class="eyebrow">IMAGE FORMAT TOOL</div>
+      <h1>圖片格式轉換器</h1>
+      <p>將圖片快速轉換成 PNG、JPG 或 WebP。檔案只會在你的瀏覽器中處理，不需要上傳到伺服器。</p>
+    </section>
+
+    <section class="panel" aria-label="圖片格式轉換工具">
+      <div class="dropzone" id="dropzone">
+        <div class="upload-icon" aria-hidden="true">↥</div>
+        <h2>選擇圖片，開始轉換</h2>
+        <p>點擊下方按鈕，或將圖片拖曳到這裡</p>
+        <input id="fileInput" type="file" accept="image/*">
+        <button class="button primary" id="chooseButton" type="button">選擇圖片</button>
+      </div>
+
+      <div class="settings">
+        <div class="field">
+          <label for="formatSelect">輸出格式</label>
+          <select id="formatSelect">
+            <option value="image/png">PNG (.png)</option>
+            <option value="image/jpeg">JPG (.jpg)</option>
+            <option value="image/webp">WebP (.webp)</option>
+          </select>
+        </div>
+        <div class="field" id="qualityField">
+          <label for="qualityRange">輸出品質（JPG / WebP）</label>
+          <div class="quality-wrap">
+            <input id="qualityRange" type="range" min="10" max="100" value="90">
+            <span id="qualityValue">90%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="file-info" id="fileInfo">尚未選擇圖片。支援常見的瀏覽器可讀取圖片格式。</div>
+
+      <div class="preview-grid">
+        <div class="preview-card">
+          <h3>原始圖片</h3>
+          <div class="preview-box" id="originalPreview"><div class="placeholder">圖片預覽會顯示在這裡</div></div>
+          <div class="preview-meta" id="originalMeta">—</div>
+        </div>
+        <div class="preview-card">
+          <h3>轉換後預覽</h3>
+          <div class="preview-box" id="convertedPreview"><div class="placeholder">選擇圖片後即可轉換預覽</div></div>
+          <div class="preview-meta" id="convertedMeta">—</div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="button secondary" id="convertButton" type="button" disabled>轉換圖片</button>
+        <button class="button primary" id="downloadButton" type="button" disabled>下載轉換圖片</button>
+      </div>
+      <div class="status" id="status" role="status" aria-live="polite"></div>
+      <p class="note">小提醒：JPG 不支援透明背景，轉換時會以白色填滿透明區域。PNG 適合需要透明背景的圖片；WebP 通常能在畫質與檔案大小之間取得不錯的平衡。</p>
+    </section>
+    <footer>圖片在本機瀏覽器處理 · 不會上傳圖片內容</footer>
+  </main>
+
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const chooseButton = document.getElementById('chooseButton');
+    const dropzone = document.getElementById('dropzone');
+    const formatSelect = document.getElementById('formatSelect');
+    const qualityRange = document.getElementById('qualityRange');
+    const qualityValue = document.getElementById('qualityValue');
+    const fileInfo = document.getElementById('fileInfo');
+    const originalPreview = document.getElementById('originalPreview');
+    const convertedPreview = document.getElementById('convertedPreview');
+    const originalMeta = document.getElementById('originalMeta');
+    const convertedMeta = document.getElementById('convertedMeta');
+    const convertButton = document.getElementById('convertButton');
+    const downloadButton = document.getElementById('downloadButton');
+    const status = document.getElementById('status');
+
+    let selectedFile = null;
+    let originalUrl = null;
+    let convertedUrl = null;
+    let convertedBlob = null;
+    let imageElement = null;
+
+    function formatBytes(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+    }
+
+    function clearConverted() {
+      if (convertedUrl) URL.revokeObjectURL(convertedUrl);
+      convertedUrl = null;
+      convertedBlob = null;
+      convertedPreview.innerHTML = '<div class="placeholder">調整格式後，點擊「轉換圖片」更新預覽</div>';
+      convertedMeta.textContent = '—';
+      downloadButton.disabled = true;
+    }
+
+    function updateQualityUI() {
+      qualityValue.textContent = qualityRange.value + '%';
+      const isPng = formatSelect.value === 'image/png';
+      qualityRange.disabled = isPng;
+      qualityRange.style.opacity = isPng ? '.4' : '1';
+      if (selectedFile) clearConverted();
+    }
+
+    function loadFile(file) {
+      if (!file) return;
+      if (!file.type.startsWith('image/')) {
+        status.textContent = '請選擇有效的圖片檔案。';
+        return;
+      }
+      if (originalUrl) URL.revokeObjectURL(originalUrl);
+      selectedFile = file;
+      originalUrl = URL.createObjectURL(file);
+      clearConverted();
+      status.textContent = '正在讀取圖片…';
+      imageElement = new Image();
+      imageElement.onload = () => {
+        originalPreview.innerHTML = '';
+        const img = document.createElement('img');
+        img.src = originalUrl;
+        img.alt = '原始圖片預覽';
+        originalPreview.appendChild(img);
+        originalMeta.textContent = `${imageElement.naturalWidth} × ${imageElement.naturalHeight} px · ${formatBytes(file.size)}`;
+        fileInfo.textContent = `檔案：${file.name}（${formatBytes(file.size)}）`;
+        convertButton.disabled = false;
+        status.textContent = '圖片已載入，可以開始轉換。';
+        convertImage();
+      };
+      imageElement.onerror = () => {
+        status.textContent = '無法讀取這張圖片，請嘗試其他檔案。';
+        convertButton.disabled = true;
+      };
+      imageElement.src = originalUrl;
+    }
+
+    function convertImage() {
+      if (!selectedFile || !imageElement || !imageElement.naturalWidth) return;
+      clearConverted();
+      status.textContent = '正在轉換圖片…';
+      const mime = formatSelect.value;
+      const canvas = document.createElement('canvas');
+      canvas.width = imageElement.naturalWidth;
+      canvas.height = imageElement.naturalHeight;
+      const ctx = canvas.getContext('2d');
+      if (mime === 'image/jpeg') {
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+      ctx.drawImage(imageElement, 0, 0);
+      const quality = Number(qualityRange.value) / 100;
+      canvas.toBlob(blob => {
+        if (!blob) {
+          status.textContent = '轉換失敗，請換一張圖片再試一次。';
+          return;
+        }
+        // 若瀏覽器不支援指定格式，toBlob 可能退回 PNG；此處避免錯誤副檔名。
+        const actualMime = blob.type || 'image/png';
+        if (actualMime !== mime) {
+          status.textContent = '此瀏覽器不支援所選格式，請改用 PNG 或其他格式。';
+          return;
+        }
+        convertedBlob = blob;
+        convertedUrl = URL.createObjectURL(blob);
+        const img = document.createElement('img');
+        img.src = convertedUrl;
+        img.alt = '轉換後圖片預覽';
+        convertedPreview.innerHTML = '';
+        convertedPreview.appendChild(img);
+        convertedMeta.textContent = `${canvas.width} × ${canvas.height} px · ${formatBytes(blob.size)}`;
+        const diff = blob.size - selectedFile.size;
+        const diffText = diff <= 0
+          ? `比原始檔案小 ${formatBytes(Math.abs(diff))}`
+          : `比原始檔案大 ${formatBytes(diff)}`;
+        status.textContent = `轉換完成！${diffText}。`;
+        downloadButton.disabled = false;
+      }, mime, mime === 'image/png' ? undefined : quality);
+    }
+
+    chooseButton.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', event => loadFile(event.target.files[0]));
+    formatSelect.addEventListener('change', updateQualityUI);
+    qualityRange.addEventListener('input', () => {
+      qualityValue.textContent = qualityRange.value + '%';
+      if (selectedFile) clearConverted();
+    });
+    convertButton.addEventListener('click', convertImage);
+    downloadButton.addEventListener('click', () => {
+      if (!convertedBlob || !selectedFile) return;
+      const extension = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp' }[formatSelect.value];
+      const baseName = selectedFile.name.replace(/\.[^/.]+$/, '') || 'converted-image';
+      const link = document.createElement('a');
+      link.href = convertedUrl;
+      link.download = `${baseName}.${extension}`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    });
+
+    ['dragenter', 'dragover'].forEach(type => dropzone.addEventListener(type, event => {
+      event.preventDefault();
+      dropzone.classList.add('dragover');
+    }));
+    ['dragleave', 'drop'].forEach(type => dropzone.addEventListener(type, event => {
+      event.preventDefault();
+      dropzone.classList.remove('dragover');
+    }));
+    dropzone.addEventListener('drop', event => {
+      const file = event.dataTransfer.files[0];
+      if (file) loadFile(file);
+    });
+
+    updateQualityUI();
+    window.addEventListener('beforeunload', () => {
+      if (originalUrl) URL.revokeObjectURL(originalUrl);
+      if (convertedUrl) URL.revokeObjectURL(convertedUrl);
+    });
+  </script>
+</body>
+</html>
